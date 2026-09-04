@@ -1537,11 +1537,11 @@
 
             // Still calculate the real discount based on total items
             if (totalMarmitas >= 30) {
-                comboDiscountPercent = 20;
+                // comboDiscountPercent = 20;
             } else if (totalMarmitas >= 20) {
-                comboDiscountPercent = 10;
+                // comboDiscountPercent = 10;
             } else if (totalMarmitas >= 10) {
-                comboDiscountPercent = 5;
+                // comboDiscountPercent = 5;
             }
 
             // UI Progress based on Chosen Goal
@@ -1563,7 +1563,7 @@
             if (progressText) progressText.innerHTML = htmlText;
             if (trackerText) trackerText.innerHTML = htmlText;
 
-            const isPromoActive = sessionStorage.getItem('cleanfoods_promo_active') === 'true';
+            const isPromoActive = false; // sessionStorage.getItem('cleanfoods_promo_active') === 'true';
 
             if (progressContainer) {
                 if (isPromoActive) {
@@ -1605,7 +1605,7 @@
             }
 
             let shippingFee = getEffectiveShippingFee();
-            if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0; // Combo monstro gives frete grátis
+            // if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0; // Combo monstro gives frete grátis
 
             const shippingRow = document.getElementById('cart-shipping-row');
             const shippingSpan = document.getElementById('cart-shipping-val');
@@ -2103,25 +2103,6 @@
             }
 
             let comboDiscountPercent = 0;
-            let comboBonus = '';
-            if (totalMarmitas >= 30) {
-                comboDiscountPercent = 20;
-                comboBonus = 'Frete Grátis';
-            } else if (totalMarmitas >= 20) {
-                comboDiscountPercent = 10;
-                comboBonus = '1 Salgado Cortesia';
-            } else if (totalMarmitas >= 10) {
-                comboDiscountPercent = 5;
-            }
-
-            if (comboBonus) {
-                orderItems.push({
-                    name: `🎁 BRINDE: ${comboBonus}`,
-                    size: 'Único',
-                    price: 0,
-                    quantity: 1
-                });
-            }
 
             // Revalidar cupom antes de aplicar
             if (appliedCoupon) {
@@ -2142,7 +2123,7 @@
             }
 
             let shippingFee = getEffectiveShippingFee();
-            if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0;
+            // if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0;
 
             const finalTotal = Math.max(0, subtotal - discountAmount + shippingFee);
 

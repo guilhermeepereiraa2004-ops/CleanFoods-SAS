@@ -2267,7 +2267,7 @@ if (typeof renderMenu === 'function') renderMenu();
             let shippingFee = getEffectiveShippingFee();
             let totalMarmitas = 0;
             for (const key in cart) totalMarmitas += cart[key].quantity;
-            if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0; // Combo monstro gives frete grátis
+            // if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0; // Combo monstro gives frete grátis
 
             const shippingRow = document.getElementById('cart-shipping-row');
             const shippingSpan = document.getElementById('cart-shipping-val');
@@ -2799,25 +2799,6 @@ if (typeof renderMenu === 'function') renderMenu();
 
             // Combo Monstro discount
             let comboDiscountPercent = 0;
-            let comboBonus = '';
-            if (totalMarmitas >= 30) {
-                comboDiscountPercent = 20;
-                comboBonus = 'Frete Grátis';
-            } else if (totalMarmitas >= 20) {
-                comboDiscountPercent = 10;
-                comboBonus = '1 Salgado Cortesia';
-            } else if (totalMarmitas >= 10) {
-                comboDiscountPercent = 5;
-            }
-
-            if (comboBonus) {
-                orderItems.push({
-                    name: `🎁 BRINDE: ${comboBonus}`,
-                    size: 'Único',
-                    price: 0,
-                    quantity: 1
-                });
-            }
 
             // Revalidar cupom antes de aplicar
             if (appliedCoupon) {
@@ -2838,7 +2819,7 @@ if (typeof renderMenu === 'function') renderMenu();
             }
 
             let shippingFee = getEffectiveShippingFee();
-            if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0;
+            // if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0;
 
             if (window.outOfRange && shippingFee === 0 && totalMarmitas < 30 && !Object.keys(cart).some(k => k.includes('teste'))) {
                 let waMsg = `Olá! Gostaria de fazer um pedido, mas meu endereço deu como "Frete a Consultar".\n\n*Nome:* ${name}\n*Endereço:* ${address}\n\nPodemos verificar o valor da entrega?`;
