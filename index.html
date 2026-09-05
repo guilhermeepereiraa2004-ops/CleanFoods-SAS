@@ -190,7 +190,7 @@
               "name": "Quais são os tamanhos de marmita disponíveis?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "As marmitas da CleanFoods estão disponíveis nos tamanhos P (Pequeno) e G (Grande), com preços a partir de R$19,50."
+                "text": "As marmitas da CleanFoods estão disponíveis nos tamanhos P (225g) e G (450g), com exceção de Frango e Patinho com Legumes que são 200g no tamanho P. Preços a partir de R$19,50."
               }
             }
           ]
@@ -262,61 +262,6 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* Custom Cursor - Hidden by default (touchscreens) */
-        .cursor-dot,
-        .cursor-outline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
-            display: none;
-        }
-
-        /* Enable custom cursor only on hover-capable pointer devices (mice/trackpads) */
-        @media (hover: hover) and (pointer: fine) {
-            body {
-                cursor: none;
-            }
-
-            .cursor-dot,
-            .cursor-outline {
-                display: block;
-            }
-
-            .cursor-dot {
-                width: 8px;
-                height: 8px;
-                background-color: var(--yellow);
-            }
-
-            .cursor-outline {
-                width: 40px;
-                height: 40px;
-                border: 2px solid var(--yellow);
-                transition: width 0.2s, height 0.2s, background-color 0.2s;
-            }
-
-            .cursor-hover .cursor-outline {
-                width: 60px;
-                height: 60px;
-                background-color: rgba(246, 197, 0, 0.1);
-                border-style: dashed;
-                animation: rotateCursor 4s linear infinite;
-            }
-        }
-
-        @keyframes rotateCursor {
-            from {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-
-            to {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
-        }
 
         /* Text Utilities */
         .text-outline {
@@ -681,8 +626,6 @@
 
 
     <div class="noise-bg"></div>
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
 
     <!-- Floating Cardapio Button -->
     <div id="floating-cardapio-btn"
@@ -1629,21 +1572,29 @@
             const hasP = isValidPrice(dish.priceP);
             const hasG = isValidPrice(dish.priceG);
 
+            let weightP = '225g';
+            if (dish.name.toLowerCase().includes('frango com legumes') || dish.name.toLowerCase().includes('patinho com legumes')) {
+                weightP = '200g';
+            }
+            let weightG = '450g';
+
             if (hasP && hasG) {
                 return `
                     <div class="flex justify-between items-center text-xs font-semibold w-full">
-                        <span class="text-gray-400">P <span class="text-white bg-cf-gray px-2 py-1 rounded ml-1 cursor-pointer hover:bg-cf-yellow hover:text-cf-black transition-all inline-flex items-center gap-1" onclick="addToCart('${dish.id}', 'P')">R$ <span id="val-${dish.id}-p">${dish.priceP}</span> <i class="fa-solid fa-plus text-[10px]"></i></span></span>
-                        <span class="text-cf-yellow">G <span class="bg-cf-yellow text-cf-black px-2 py-1 rounded ml-1 cursor-pointer hover:bg-white hover:text-cf-black transition-all inline-flex items-center gap-1" onclick="addToCart('${dish.id}', 'G')">R$ <span id="val-${dish.id}-g">${dish.priceG}</span> <i class="fa-solid fa-plus text-[10px]"></i></span></span>
+                        <span class="text-gray-400">P (${weightP}) <span class="text-white bg-cf-gray px-2 py-1 rounded ml-1 cursor-pointer hover:bg-cf-yellow hover:text-cf-black transition-all inline-flex items-center gap-1" onclick="addToCart('${dish.id}', 'P')">R$ <span id="val-${dish.id}-p">${dish.priceP}</span> <i class="fa-solid fa-plus text-[10px]"></i></span></span>
+                        <span class="text-cf-yellow">G (${weightG}) <span class="bg-cf-yellow text-cf-black px-2 py-1 rounded ml-1 cursor-pointer hover:bg-white hover:text-cf-black transition-all inline-flex items-center gap-1" onclick="addToCart('${dish.id}', 'G')">R$ <span id="val-${dish.id}-g">${dish.priceG}</span> <i class="fa-solid fa-plus text-[10px]"></i></span></span>
                     </div>
                 `;
             }
 
             const singlePrice = hasP ? dish.priceP : (hasG ? dish.priceG : '');
             const singleSize = hasP ? 'P' : 'G';
+            const singleWeight = hasP ? weightP : weightG;
 
             if (singlePrice) {
                 return `
-                    <div class="flex justify-center items-center text-xs font-semibold w-full">
+                    <div class="flex justify-center items-center text-xs font-semibold w-full gap-2">
+                        <span class="text-gray-400">${singleSize} (${singleWeight})</span>
                         <span class="bg-cf-yellow text-cf-black px-3.5 py-1.5 rounded cursor-pointer hover:bg-white hover:text-cf-black transition-all inline-flex items-center gap-1.5 font-bold text-xs sm:text-sm" onclick="addToCart('${dish.id}', '${singleSize}')">
                             R$ <span id="val-${dish.id}-single">${singlePrice}</span> <i class="fa-solid fa-plus text-[10px]"></i>
                         </span>
@@ -1960,37 +1911,6 @@ if (typeof renderMenu === 'function') renderMenu();
             }
         }
 
-        // Custom Cursor Logic
-        const cursorDot = document.querySelector('.cursor-dot');
-        const cursorOutline = document.querySelector('.cursor-outline');
-        const hoverables = document.querySelectorAll('.cursor-hover, a, button');
-
-        // Only activate custom cursor on non-touch devices
-        if (window.matchMedia("(pointer: fine)").matches) {
-            window.addEventListener('mousemove', (e) => {
-                const posX = e.clientX;
-                const posY = e.clientY;
-
-                // Move dot instantly
-                cursorDot.style.left = `${posX}px`;
-                cursorDot.style.top = `${posY}px`;
-
-                // Move outline with slight delay (requestAnimationFrame for smoothness)
-                cursorOutline.animate({
-                    left: `${posX}px`,
-                    top: `${posY}px`
-                }, { duration: 500, fill: "forwards" });
-            });
-
-            hoverables.forEach(elem => {
-                elem.addEventListener('mouseenter', () => {
-                    document.body.classList.add('cursor-hover');
-                });
-                elem.addEventListener('mouseleave', () => {
-                    document.body.classList.remove('cursor-hover');
-                });
-            });
-        }
 
         // Cart toggle
         function toggleCart() {
