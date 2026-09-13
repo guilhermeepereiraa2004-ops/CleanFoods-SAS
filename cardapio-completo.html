@@ -1673,20 +1673,40 @@
 
             let selectedIsoDate = savedDate || '';
 
-            for (let i = 0; i <= 7; i++) {
+            if (selectedIsoDate) {
+                const [y, m, d] = selectedIsoDate.split('-');
+                const savedD = new Date(y, m - 1, d);
+                const dayOfWeek = savedD.getDay();
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    selectedIsoDate = '';
+                }
+            }
+
+            let validDaysFound = 0;
+            let offset = 0;
+
+            while (validDaysFound <= 7) {
                 const d = new Date(today);
-                d.setDate(today.getDate() + i);
+                d.setDate(today.getDate() + offset);
+
+                const dayOfWeek = d.getDay();
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    offset++;
+                    continue;
+                }
 
                 const year = d.getFullYear();
                 const month = String(d.getMonth() + 1).padStart(2, '0');
                 const day = String(d.getDate()).padStart(2, '0');
                 const isoDate = `${year}-${month}-${day}`;
 
-                if (i === 0 && !selectedIsoDate) {
+                if (!selectedIsoDate) {
                     selectedIsoDate = isoDate;
                 }
 
-                const dayLabel = i === 0 ? 'Hoje' : (i === 1 ? 'Amanhã' : daysOfWeek[d.getDay()]);
+                const isToday = offset === 0;
+                const isTomorrow = offset === 1;
+                const dayLabel = isToday ? 'Hoje' : (isTomorrow ? 'Amanhã' : daysOfWeek[dayOfWeek]);
 
                 const btn = document.createElement('button');
                 btn.type = 'button';
@@ -1707,6 +1727,9 @@
                 };
 
                 container.appendChild(btn);
+                
+                validDaysFound++;
+                offset++;
             }
 
             hiddenInput.value = selectedIsoDate;
