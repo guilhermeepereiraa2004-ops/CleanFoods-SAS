@@ -1232,44 +1232,6 @@
                     </div>
                 </div>
 
-                <!-- Local Payment Method (Only for Retirada) -->
-                <div id="local-payment-container" class="hidden space-y-3">
-                    <label class="block text-xs uppercase font-bold text-gray-400 mb-1.5 tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-wallet text-cf-yellow"></i> Forma de Pagamento (Na Retirada) *
-                    </label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="local-payment-method" value="Pix" class="peer sr-only">
-                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
-                                <i class="fa-brands fa-pix text-lg mb-1"></i> Pix
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="local-payment-method" value="Cartão de Crédito" class="peer sr-only">
-                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
-                                <i class="fa-solid fa-credit-card text-lg mb-1"></i> Crédito
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="local-payment-method" value="Cartão de Débito" class="peer sr-only">
-                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
-                                <i class="fa-regular fa-credit-card text-lg mb-1"></i> Débito
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="local-payment-method" value="VR / VA" class="peer sr-only">
-                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
-                                <i class="fa-solid fa-utensils text-lg mb-1"></i> VR/VA
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="local-payment-method" value="Dinheiro" class="peer sr-only">
-                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
-                                <i class="fa-solid fa-money-bill-wave text-lg mb-1"></i> Dinheiro
-                            </div>
-                        </label>
-                    </div>
-                </div>
 
                 <!-- Delivery Date Selection (Pills / Cards) -->
                 <div>
@@ -2330,27 +2292,21 @@ if (typeof renderMenu === 'function') renderMenu();
             const el = document.querySelector('input[name="delivery-type"]:checked');
             const isRetirada = el && el.value === 'retirada';
             const addressContainer = document.getElementById('delivery-address-container');
-            const localPaymentContainer = document.getElementById('local-payment-container');
-            
+
             if (isRetirada) {
                 if(addressContainer) addressContainer.classList.add('hidden');
                 document.getElementById('client-rua').removeAttribute('required');
                 document.getElementById('client-numero').removeAttribute('required');
                 document.getElementById('client-bairro').removeAttribute('required');
                 document.getElementById('client-cidade-uf').removeAttribute('required');
-
-                if(localPaymentContainer) localPaymentContainer.classList.remove('hidden');
             } else {
                 if(addressContainer) addressContainer.classList.remove('hidden');
                 document.getElementById('client-rua').setAttribute('required', 'true');
                 document.getElementById('client-numero').setAttribute('required', 'true');
                 document.getElementById('client-bairro').setAttribute('required', 'true');
                 document.getElementById('client-cidade-uf').setAttribute('required', 'true');
-
-                if(localPaymentContainer) localPaymentContainer.classList.add('hidden');
-                document.querySelectorAll('input[name="local-payment-method"]').forEach(radio => radio.checked = false);
             }
-            updateCheckoutTotal();
+            renderCart();
         }
 
         function getEffectiveShippingFee() {
@@ -2769,15 +2725,6 @@ if (typeof renderMenu === 'function') renderMenu();
                 return;
             }
 
-            if (isRetirada) {
-                const localPaymentEl = document.querySelector('input[name="local-payment-method"]:checked');
-                const localPayment = localPaymentEl ? localPaymentEl.value : null;
-                if (!localPayment) {
-                    alert("Por favor, selecione a Forma de Pagamento para a retirada.");
-                    return;
-                }
-            }
-
             if (!deliveryDate) {
                 alert("Por favor, selecione a Data da Entrega.");
                 if (dateInput) dateInput.focus();
@@ -2914,15 +2861,6 @@ if (typeof renderMenu === 'function') renderMenu();
 
             // ------------------ NEW FLOW ------------------
             window.currentOrderData = order;
-
-            if (isRetirada) {
-                const localPaymentEl = document.querySelector('input[name="local-payment-method"]:checked');
-                const localPayment = localPaymentEl ? localPaymentEl.value : null;
-                order.payment = localPayment + " (Retirada)";
-                await finalizeAndSaveOrder(order.payment, null, false);
-                isSubmitting = false;
-                return;
-            }
 
             // Esconde form e mostra o Mercado Pago
             document.getElementById('checkout-form').classList.add('hidden');
