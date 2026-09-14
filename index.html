@@ -1188,8 +1188,29 @@
                     </div>
                 </div>
 
+                <!-- Delivery Type -->
+                <div class="space-y-2">
+                    <label class="block text-xs uppercase font-bold text-gray-400 mb-1.5 tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-motorcycle text-cf-yellow"></i> Tipo de Entrega *
+                    </label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="delivery-type" value="entrega" class="peer sr-only" checked onchange="toggleDeliveryType()">
+                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2.5 font-bold peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all">
+                                <i class="fa-solid fa-motorcycle mr-1"></i> Entrega
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="delivery-type" value="retirada" class="peer sr-only" onchange="toggleDeliveryType()">
+                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2.5 font-bold peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all">
+                                <i class="fa-solid fa-store mr-1"></i> Retirada
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Delivery Address -->
-                <div class="space-y-3">
+                <div class="space-y-3" id="delivery-address-container">
                     <label class="block text-xs uppercase font-bold text-gray-400 mb-1.5 tracking-wider flex items-center gap-1.5">
                         <i class="fa-solid fa-location-dot text-cf-yellow"></i> Endereço de Entrega *
                     </label>
@@ -1208,6 +1229,45 @@
                     <div class="grid grid-cols-2 gap-2">
                         <input type="text" id="client-bairro" placeholder="Bairro" required class="client-bairro w-full bg-cf-black text-white border-2 border-cf-gray rounded px-4 py-2.5 font-bold focus:border-cf-yellow focus:ring-2 focus:ring-cf-yellow/20 focus:outline-none transition-all placeholder:text-gray-600">
                         <input type="text" id="client-cidade-uf" placeholder="Cidade - UF" required class="client-cidade-uf w-full bg-cf-black text-white border-2 border-cf-gray rounded px-4 py-2.5 font-bold focus:border-cf-yellow focus:ring-2 focus:ring-cf-yellow/20 focus:outline-none transition-all placeholder:text-gray-600">
+                    </div>
+                </div>
+
+                <!-- Local Payment Method (Only for Retirada) -->
+                <div id="local-payment-container" class="hidden space-y-3">
+                    <label class="block text-xs uppercase font-bold text-gray-400 mb-1.5 tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-wallet text-cf-yellow"></i> Forma de Pagamento (Na Retirada) *
+                    </label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="local-payment-method" value="Pix" class="peer sr-only">
+                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
+                                <i class="fa-brands fa-pix text-lg mb-1"></i> Pix
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="local-payment-method" value="Cartão de Crédito" class="peer sr-only">
+                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
+                                <i class="fa-solid fa-credit-card text-lg mb-1"></i> Crédito
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="local-payment-method" value="Cartão de Débito" class="peer sr-only">
+                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
+                                <i class="fa-regular fa-credit-card text-lg mb-1"></i> Débito
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="local-payment-method" value="VR / VA" class="peer sr-only">
+                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
+                                <i class="fa-solid fa-utensils text-lg mb-1"></i> VR/VA
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="local-payment-method" value="Dinheiro" class="peer sr-only">
+                            <div class="text-center bg-cf-black text-white border-2 border-cf-gray rounded py-2 font-bold text-xs sm:text-sm peer-checked:border-cf-yellow peer-checked:bg-cf-yellow peer-checked:text-cf-black transition-all flex flex-col items-center justify-center h-full">
+                                <i class="fa-solid fa-money-bill-wave text-lg mb-1"></i> Dinheiro
+                            </div>
+                        </label>
                     </div>
                 </div>
 
@@ -2266,7 +2326,37 @@ if (typeof renderMenu === 'function') renderMenu();
             if (chkTotalSpan) chkTotalSpan.innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
         }
 
+        function toggleDeliveryType() {
+            const el = document.querySelector('input[name="delivery-type"]:checked');
+            const isRetirada = el && el.value === 'retirada';
+            const addressContainer = document.getElementById('delivery-address-container');
+            const localPaymentContainer = document.getElementById('local-payment-container');
+            
+            if (isRetirada) {
+                if(addressContainer) addressContainer.classList.add('hidden');
+                document.getElementById('client-rua').removeAttribute('required');
+                document.getElementById('client-numero').removeAttribute('required');
+                document.getElementById('client-bairro').removeAttribute('required');
+                document.getElementById('client-cidade-uf').removeAttribute('required');
+
+                if(localPaymentContainer) localPaymentContainer.classList.remove('hidden');
+            } else {
+                if(addressContainer) addressContainer.classList.remove('hidden');
+                document.getElementById('client-rua').setAttribute('required', 'true');
+                document.getElementById('client-numero').setAttribute('required', 'true');
+                document.getElementById('client-bairro').setAttribute('required', 'true');
+                document.getElementById('client-cidade-uf').setAttribute('required', 'true');
+
+                if(localPaymentContainer) localPaymentContainer.classList.add('hidden');
+                document.querySelectorAll('input[name="local-payment-method"]').forEach(radio => radio.checked = false);
+            }
+            updateCheckoutTotal();
+        }
+
         function getEffectiveShippingFee() {
+            const el = document.querySelector('input[name="delivery-type"]:checked');
+            if (el && el.value === 'retirada') return 0;
+
             if (typeof window.dynamicShippingFee !== 'undefined') {
                 return window.dynamicShippingFee;
             }
@@ -2630,6 +2720,9 @@ if (typeof renderMenu === 'function') renderMenu();
             const dateInput = document.getElementById('delivery-date');
             const timeInput = document.getElementById('delivery-time');
             
+            const deliveryTypeEl = document.querySelector('input[name="delivery-type"]:checked');
+            const isRetirada = deliveryTypeEl && deliveryTypeEl.value === 'retirada';
+
             // Build address from new fields
             const rua = document.getElementById('client-rua') ? document.getElementById('client-rua').value.trim() : '';
             const num = document.getElementById('client-numero') ? document.getElementById('client-numero').value.trim() : '';
@@ -2639,11 +2732,15 @@ if (typeof renderMenu === 'function') renderMenu();
             const cep = document.getElementById('client-cep') ? document.getElementById('client-cep').value.trim() : '';
             
             let builtAddress = "";
-            if (rua && num && bairro && cid) {
-                builtAddress = `${rua}, ${num}`;
-                if (comp) builtAddress += ` - ${comp}`;
-                builtAddress += ` - ${bairro}, ${cid}`;
-                if (cep) builtAddress += ` - CEP: ${cep}`;
+            if (isRetirada) {
+                builtAddress = "Retirada no Local";
+            } else {
+                if (rua && num && bairro && cid) {
+                    builtAddress = `${rua}, ${num}`;
+                    if (comp) builtAddress += ` - ${comp}`;
+                    builtAddress += ` - ${bairro}, ${cid}`;
+                    if (cep) builtAddress += ` - CEP: ${cep}`;
+                }
             }
             if (addressInput) addressInput.value = builtAddress;
 
@@ -2671,11 +2768,16 @@ if (typeof renderMenu === 'function') renderMenu();
                 if (numInput && !numInput.value) numInput.focus();
                 return;
             }
-            if (!payment) {
-                alert("Por favor, escolha uma Forma de Pagamento.");
-                if (paymentInput) paymentInput.focus();
-                return;
+
+            if (isRetirada) {
+                const localPaymentEl = document.querySelector('input[name="local-payment-method"]:checked');
+                const localPayment = localPaymentEl ? localPaymentEl.value : null;
+                if (!localPayment) {
+                    alert("Por favor, selecione a Forma de Pagamento para a retirada.");
+                    return;
+                }
             }
+
             if (!deliveryDate) {
                 alert("Por favor, selecione a Data da Entrega.");
                 if (dateInput) dateInput.focus();
@@ -2764,7 +2866,7 @@ if (typeof renderMenu === 'function') renderMenu();
             let shippingFee = getEffectiveShippingFee();
             // if (totalMarmitas >= 30 || Object.keys(cart).some(k => k.includes('teste'))) shippingFee = 0;
 
-            if (window.outOfRange && shippingFee === 0 && totalMarmitas < 30 && !Object.keys(cart).some(k => k.includes('teste'))) {
+            if (!isRetirada && window.outOfRange && shippingFee === 0 && totalMarmitas < 30 && !Object.keys(cart).some(k => k.includes('teste'))) {
                 let waMsg = `Olá! Gostaria de fazer um pedido, mas meu endereço deu como "Frete a Consultar".\n\n*Nome:* ${name}\n*Endereço:* ${address}\n\nPodemos verificar o valor da entrega?`;
                 window.open(`https://wa.me/5511910993953?text=${encodeURIComponent(waMsg)}`, '_blank');
                 isSubmitting = false;
@@ -2780,7 +2882,7 @@ if (typeof renderMenu === 'function') renderMenu();
                     price: shippingFee,
                     quantity: 1
                 });
-            } else if (window.outOfRange) {
+            } else if (!isRetirada && window.outOfRange) {
                 orderItems.push({
                     name: `🚚 Taxa de Entrega (A Consultar)`,
                     size: 'Único',
@@ -2812,6 +2914,15 @@ if (typeof renderMenu === 'function') renderMenu();
 
             // ------------------ NEW FLOW ------------------
             window.currentOrderData = order;
+
+            if (isRetirada) {
+                const localPaymentEl = document.querySelector('input[name="local-payment-method"]:checked');
+                const localPayment = localPaymentEl ? localPaymentEl.value : null;
+                order.payment = localPayment + " (Retirada)";
+                await finalizeAndSaveOrder(order.payment, null, false);
+                isSubmitting = false;
+                return;
+            }
 
             // Esconde form e mostra o Mercado Pago
             document.getElementById('checkout-form').classList.add('hidden');
