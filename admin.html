@@ -355,7 +355,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <!-- Faturamento -->
                     <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-l-4 border-cf-yellow flex justify-between items-center shadow-lg relative overflow-hidden group rounded-r">
-                        <div class="absolute w-24 h-24 bg-cf-yellow/5 rounded-full -right-8 -top-8 group-hover:scale-150 transition-transform duration-500"></div>
                         <div class="relative z-10">
                             <div class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Faturamento Estimado</div>
                             <div class="font-impact text-3xl text-white" id="stat-revenue">R$ 0,00</div>
@@ -365,7 +364,6 @@
                     </div>
                     <!-- Marmitas -->
                     <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-l-4 border-white flex justify-between items-center shadow-lg relative overflow-hidden group rounded-r">
-                        <div class="absolute w-24 h-24 bg-white/5 rounded-full -right-8 -top-8 group-hover:scale-150 transition-transform duration-500"></div>
                         <div class="relative z-10">
                             <div class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Marmitas Vendidas</div>
                             <div class="font-impact text-3xl text-white" id="stat-meals">0 Marmitas</div>
@@ -375,7 +373,6 @@
                     </div>
                     <!-- Pedidos -->
                     <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-l-4 border-cf-yellow flex justify-between items-center shadow-lg relative overflow-hidden group rounded-r">
-                        <div class="absolute w-24 h-24 bg-cf-yellow/5 rounded-full -right-8 -top-8 group-hover:scale-150 transition-transform duration-500"></div>
                         <div class="relative z-10">
                             <div class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total de Pedidos</div>
                             <div class="font-impact text-3xl text-white" id="stat-orders-count">0 pedidos</div>
@@ -385,44 +382,15 @@
                     </div>
                 </div>
 
-                <!-- Insights Grid (New) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <!-- Prato Mais Vendido -->
-                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-cf-yellow rounded shadow-lg hover:shadow-[0_0_15px_rgba(246,197,0,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
-                        <div class="absolute w-20 h-20 bg-cf-yellow/5 rounded-full -right-6 -top-6 group-hover:scale-150 transition-transform duration-500"></div>
-                        <i class="fa-solid fa-trophy text-cf-yellow text-3xl mb-3 relative z-10"></i>
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Prato Campeão</div>
-                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-top-dish">-</div>
-                        <div class="text-xs text-cf-yellow font-black mt-3 bg-cf-yellow/10 px-3 py-1 rounded-full relative z-10" id="stat-top-dish-qtd">0 vendidos</div>
-                    </div>
-                    <!-- Pior Prato -->
-                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-red-500 rounded shadow-lg hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
-                        <div class="absolute w-20 h-20 bg-red-500/5 rounded-full -right-6 -top-6 group-hover:scale-150 transition-transform duration-500"></div>
-                        <i class="fa-solid fa-arrow-trend-down text-red-500 text-3xl mb-3 relative z-10"></i>
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Menos Vendido</div>
-                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-worst-dish">-</div>
-                        <div class="text-xs text-red-500 font-black mt-3 bg-red-500/10 px-3 py-1 rounded-full relative z-10" id="stat-worst-dish-qtd">0 vendidos</div>
-                    </div>
-                    <!-- Melhor Cliente -->
-                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-green-500 rounded shadow-lg hover:shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
-                        <div class="absolute w-20 h-20 bg-green-500/5 rounded-full -right-6 -top-6 group-hover:scale-150 transition-transform duration-500"></div>
-                        <i class="fa-solid fa-crown text-green-500 text-3xl mb-3 relative z-10"></i>
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Melhor Cliente</div>
-                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-top-client">-</div>
-                        <div class="text-xs text-green-500 font-black mt-3 bg-green-500/10 px-3 py-1 rounded-full relative z-10" id="stat-top-client-rev">R$ 0,00</div>
-                    </div>
-                    <!-- Linha Destaque -->
-                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-orange-500 rounded shadow-lg hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
-                        <div class="absolute w-20 h-20 bg-orange-500/5 rounded-full -right-6 -top-6 group-hover:scale-150 transition-transform duration-500"></div>
-                        <i class="fa-solid fa-fire text-orange-500 text-3xl mb-3 relative z-10"></i>
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Linha Destaque</div>
-                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-top-category">-</div>
-                        <div class="text-xs text-orange-500 font-black mt-3 bg-orange-500/10 px-3 py-1 rounded-full relative z-10" id="stat-top-category-qtd">0 marmitas</div>
+                <!-- Charts Area (Yearly Sales) -->
+                <div class="bg-cf-darkgray p-6 border border-cf-gray rounded shadow-lg mb-6">
+                    <h3 class="font-impact text-lg text-white uppercase mb-4 text-center">Volume de vendas dos últimos 12 meses</h3>
+                    <div class="relative h-80 w-full flex items-center justify-center" id="chart-yearly-sales-container">
+                        <canvas id="yearlySalesChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Charts Area -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
                     <!-- Chart 1: Sales over time -->
                     <div class="bg-cf-darkgray p-6 border border-cf-gray rounded shadow-lg">
                         <h3 class="font-impact text-lg text-white uppercase mb-4 text-center">Vendas nos Últimos 7 Dias</h3>
@@ -436,6 +404,45 @@
                         <div class="relative h-64 w-full flex justify-center items-center" id="chart-category-container">
                             <canvas id="categoryChart"></canvas>
                         </div>
+                    </div>
+                    <!-- Chart 3: Sales by Weekday -->
+                    <div class="bg-cf-darkgray p-6 border border-cf-gray rounded shadow-lg">
+                        <h3 class="font-impact text-lg text-white uppercase mb-4 text-center">Vendas por Dia da Semana</h3>
+                        <div class="relative h-64 w-full flex justify-center items-center" id="chart-weekday-container">
+                            <canvas id="weekdaySalesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Grid (New) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <!-- Prato Mais Vendido -->
+                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-cf-yellow rounded shadow-lg hover:shadow-[0_0_15px_rgba(246,197,0,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
+                        <i class="fa-solid fa-trophy text-cf-yellow text-3xl mb-3 relative z-10"></i>
+                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Prato Campeão</div>
+                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-top-dish">-</div>
+                        <div class="text-xs text-cf-yellow font-black mt-3 bg-cf-yellow/10 px-3 py-1 rounded-full relative z-10" id="stat-top-dish-qtd">0 vendidos</div>
+                    </div>
+                    <!-- Pior Prato -->
+                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-red-500 rounded shadow-lg hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
+                        <i class="fa-solid fa-arrow-trend-down text-red-500 text-3xl mb-3 relative z-10"></i>
+                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Menos Vendido</div>
+                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-worst-dish">-</div>
+                        <div class="text-xs text-red-500 font-black mt-3 bg-red-500/10 px-3 py-1 rounded-full relative z-10" id="stat-worst-dish-qtd">0 vendidos</div>
+                    </div>
+                    <!-- Melhor Cliente -->
+                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-green-500 rounded shadow-lg hover:shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
+                        <i class="fa-solid fa-crown text-green-500 text-3xl mb-3 relative z-10"></i>
+                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Melhor Cliente</div>
+                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-top-client">-</div>
+                        <div class="text-xs text-green-500 font-black mt-3 bg-green-500/10 px-3 py-1 rounded-full relative z-10" id="stat-top-client-rev">R$ 0,00</div>
+                    </div>
+                    <!-- Linha Destaque -->
+                    <div class="bg-gradient-to-br from-cf-darkgray to-cf-black p-6 border-t-2 border-orange-500 rounded shadow-lg hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-all duration-300 flex flex-col justify-center items-center text-center relative overflow-hidden group">
+                        <i class="fa-solid fa-fire text-orange-500 text-3xl mb-3 relative z-10"></i>
+                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2 relative z-10">Linha Destaque</div>
+                        <div class="text-white font-bold text-sm leading-snug line-clamp-2 min-h-[40px] flex items-center relative z-10" id="stat-top-category">-</div>
+                        <div class="text-xs text-orange-500 font-black mt-3 bg-orange-500/10 px-3 py-1 rounded-full relative z-10" id="stat-top-category-qtd">0 marmitas</div>
                     </div>
                 </div>
             </div>
@@ -3725,6 +3732,8 @@
 
         let salesChartInstance = null;
         let categoryChartInstance = null;
+        let yearlySalesChartInstance = null;
+        let weekdaySalesChartInstance = null;
 
         function updateDashboardStats() {
             let totalRevenue = 0;
@@ -3734,6 +3743,27 @@
             let categoryCounts = {};
             let clientRevenue = {};
             let salesByDate = {};
+            let salesByWeekday = [0, 0, 0, 0, 0, 0, 0];
+
+            const ptMonths = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            let salesByMonthMap = new Map();
+            const now = new Date();
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const label = `${ptMonths[d.getMonth()]}/${d.getFullYear()}`;
+                salesByMonthMap.set(label, 0);
+            }
+
+            orders.forEach(order => {
+                const orderTotal = parseFloat(order.total || 0);
+                const orderDate = new Date(order.date || order.created_at || 0);
+                const label = `${ptMonths[orderDate.getMonth()]}/${orderDate.getFullYear()}`;
+                if (salesByMonthMap.has(label)) {
+                    salesByMonthMap.set(label, salesByMonthMap.get(label) + orderTotal);
+                }
+            });
+            const yearlySalesLabels = Array.from(salesByMonthMap.keys());
+            const yearlySalesData = Array.from(salesByMonthMap.values());
 
             const monthFilter = document.getElementById('dashboard-month-filter');
             const selectedMonth = monthFilter ? monthFilter.value : 'all';
@@ -3765,6 +3795,10 @@
                 const dateKey = orderDate.toISOString().split('T')[0];
                 if (!salesByDate[dateKey]) salesByDate[dateKey] = 0;
                 salesByDate[dateKey] += orderTotal;
+
+                // Group by weekday
+                const weekday = orderDate.getDay();
+                salesByWeekday[weekday] += orderTotal;
 
                 order.items.forEach(item => {
                     const itemNameLower = item.name.toLowerCase();
@@ -3815,10 +3849,10 @@
             document.getElementById('stat-top-category').innerText = topCategory ? topCategory[0] : '-';
             document.getElementById('stat-top-category-qtd').innerText = topCategory ? `${topCategory[1]} marmitas` : '0 marmitas';
 
-            renderCharts(categoryCounts, salesByDate);
+            renderCharts(categoryCounts, salesByDate, yearlySalesLabels, yearlySalesData, salesByWeekday);
         }
 
-        function renderCharts(categoryCounts, salesByDate) {
+        function renderCharts(categoryCounts, salesByDate, yearlySalesLabels, yearlySalesData, salesByWeekday) {
             if (typeof Chart === 'undefined') return;
 
             // Render Category Chart (Doughnut)
@@ -3846,6 +3880,68 @@
                         maintainAspectRatio: false,
                         plugins: {
                             legend: { position: 'right', labels: { color: '#fff' } }
+                        }
+                    }
+                });
+            }
+
+            // Render Yearly Sales Chart (Bar)
+            const ctxYearly = document.getElementById('yearlySalesChart');
+            if (ctxYearly) {
+                if (yearlySalesChartInstance) yearlySalesChartInstance.destroy();
+                
+                yearlySalesChartInstance = new Chart(ctxYearly, {
+                    type: 'bar',
+                    data: {
+                        labels: yearlySalesLabels,
+                        datasets: [{
+                            label: 'Valor',
+                            data: yearlySalesData,
+                            backgroundColor: '#F6C500',
+                            borderWidth: 0,
+                            borderRadius: 4,
+                            barPercentage: 0.5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                grid: { color: '#333' }, 
+                                ticks: { 
+                                    color: '#999',
+                                    callback: function(value) {
+                                        if (value >= 1000) {
+                                            return (value / 1000) + 'k';
+                                        }
+                                        return value;
+                                    }
+                                } 
+                            },
+                            x: { grid: { display: false }, ticks: { color: '#999' } }
+                        },
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                position: 'bottom',
+                                labels: { color: '#fff', usePointStyle: true, pointStyle: 'circle' }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
                         }
                     }
                 });
@@ -3893,6 +3989,64 @@
                         },
                         plugins: {
                             legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Render Weekday Sales Chart (Bar)
+            const ctxWeekday = document.getElementById('weekdaySalesChart');
+            if (ctxWeekday) {
+                if (weekdaySalesChartInstance) weekdaySalesChartInstance.destroy();
+                
+                weekdaySalesChartInstance = new Chart(ctxWeekday, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                        datasets: [{
+                            label: 'Volume de Vendas',
+                            data: salesByWeekday,
+                            backgroundColor: '#F6C500',
+                            borderWidth: 0,
+                            borderRadius: 4,
+                            barPercentage: 0.5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                grid: { color: '#333' }, 
+                                ticks: { 
+                                    color: '#999',
+                                    callback: function(value) {
+                                        if (value >= 1000) {
+                                            return (value / 1000) + 'k';
+                                        }
+                                        return value;
+                                    }
+                                } 
+                            },
+                            x: { grid: { display: false }, ticks: { color: '#999' } }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
                         }
                     }
                 });
