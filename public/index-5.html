@@ -81,14 +81,14 @@
           "sameAs": [
             "https://wa.me/5511910993953"
           ],
-          "hasMenu": "https://www.cleanfoodsp.com.br/cardapio-completo.html"
+          "hasMenu": "https://www.cleanfoodsp.com.br/#cardapio"
         },
         {
           "@type": "Menu",
           "@id": "https://www.cleanfoodsp.com.br/#menu",
           "name": "Cardápio CleanFoods",
           "description": "Marmitas fitness com frango, patinho bovino e opções gourmet, nos tamanhos P e G.",
-          "url": "https://www.cleanfoodsp.com.br/cardapio-completo.html",
+          "url": "https://www.cleanfoodsp.com.br/#cardapio",
           "hasMenuSection": [
             {
               "@type": "MenuSection",
@@ -592,7 +592,7 @@
             }
 
             #hero-title {
-                font-size: clamp(3rem, 13vh, 9.5rem) !important;
+                font-size: clamp(3rem, min(6.5vw, 10vh), 9.5rem) !important;
                 line-height: 0.85 !important;
             }
 
@@ -605,7 +605,7 @@
             }
 
             #hero-image-container {
-                max-width: clamp(450px, 85vh, 1000px) !important;
+                max-width: clamp(350px, min(42vw, 75vh), 1000px) !important;
             }
 
             #hero-subtitle {
@@ -619,6 +619,7 @@
             }
         }
     </style>
+<style id='saas-fouc-preventer'>body { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }</style>
 </head>
 
 <body class="antialiased font-body relative">
@@ -630,7 +631,7 @@
     <!-- Floating Cardapio Button -->
     <div id="floating-cardapio-btn"
         class="fixed bottom-6 left-6 z-40 opacity-0 pointer-events-none transform translate-y-24 scale-75 transition-all duration-500 ease-out">
-        <a href="cardapio-completo.html"
+        <a href="#cardapio"
             class="bg-cf-yellow text-cf-black font-impact text-xl sm:text-2xl uppercase tracking-wider px-6 py-4 border-4 border-cf-black hover:border-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(246,197,0,0.8)] cursor-hover btn-attention">
             <i class="fa-solid fa-book-open mr-2"></i> CARDÁPIO
         </a>
@@ -663,7 +664,7 @@
 
         <div class="flex items-center justify-end gap-3 sm:gap-4 md:gap-6 mt-1 md:mt-0">
 
-            <a href="admin.html"
+            <a href="#" onclick="window.parent.location.href = '/' + (sessionStorage.getItem('active_tenant') || '') + '/admin'; return false;"
                 class="font-impact text-[10px] sm:text-xs md:text-sm text-cf-black bg-white hover:bg-cf-yellow border border-white hover:border-cf-yellow px-2 py-1 transition-colors tracking-wider cursor-hover uppercase rounded-sm flex items-center gap-1 shadow-md">
                 ADMIN <i class="fa-solid fa-user-gear text-[10px]"></i>
             </a>
@@ -813,7 +814,7 @@
                     NO EXCUSES
                 </div>
                 <div class="mt-8">
-                    <a href="cardapio-completo.html" class="btn-street cursor-hover">
+                    <a href="#cardapio" class="btn-street cursor-hover">
                         PEDIR AGORA
                     </a>
                 </div>
@@ -3535,7 +3536,7 @@ if (typeof renderMenu === 'function') renderMenu();
 
         function selectCombo(goal) {
             localStorage.setItem('cleanfoods_combo_goal', goal);
-            window.location.href = 'cardapio-completo.html?promo=active';
+            window.location.href = '#cardapio';
         }
     </script>
     <!-- Custom Alert Modal (Overwrites default window.alert) -->
@@ -3660,3 +3661,4 @@ if (typeof renderMenu === 'function') renderMenu();
     </script>
 </body>
 </html>
+

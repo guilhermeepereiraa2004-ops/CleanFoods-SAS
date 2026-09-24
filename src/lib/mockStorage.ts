@@ -10,6 +10,7 @@ export interface Tenant {
   primaryColor: string;
   fontFamily: string;
   bodyFontFamily?: string;
+  heroFontFamily?: string;
   mercadoPagoKey?: string;
   createdAt: string;
   // Hero text overrides
@@ -18,7 +19,36 @@ export interface Tenant {
   heroWord3?: string;
   heroWord4?: string;
   heroImageUrl?: string;
+  heroFontColor?: string;
+  heroFontSize?: string;
+  heroImageSize?: string;
+  heroSubtitle?: string;
+  heroSubtitleFont?: string;
+  heroSubtitleSize?: string;
+  logoSize?: string;
+  
+  // Acesso e Cobrança
+  adminUser?: string;
+  adminPassword?: string;
+  paymentDay?: string; // Dia do mês (1 a 31)
+  paymentStatus?: 'pago' | 'pendente';
 }
+
+export interface MasterConfig {
+  pixKey: string;
+  pixName: string;
+}
+
+export const getMasterConfig = (): MasterConfig => {
+  if (typeof window === 'undefined') return { pixKey: '', pixName: '' };
+  return JSON.parse(localStorage.getItem('saas_master_config') || '{"pixKey": "", "pixName": ""}');
+};
+
+export const saveMasterConfig = (config: MasterConfig) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('saas_master_config', JSON.stringify(config));
+  }
+};
 
 export const getTenants = (): Tenant[] => {
   if (typeof window === 'undefined') return [];
@@ -37,6 +67,13 @@ export const saveTenant = (tenant: Tenant) => {
   }
   
   localStorage.setItem('saas_tenants', JSON.stringify(tenants));
+};
+
+export const deleteTenant = (id: string) => {
+  if (typeof window === 'undefined') return;
+  const tenants = getTenants();
+  const newTenants = tenants.filter(t => t.id !== id);
+  localStorage.setItem('saas_tenants', JSON.stringify(newTenants));
 };
 
 export const getTenantBySlug = (slug: string): Tenant | null => {

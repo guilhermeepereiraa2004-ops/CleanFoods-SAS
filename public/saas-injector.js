@@ -11,14 +11,58 @@ function initSaas() {
         tenantSlug = sessionStorage.getItem('active_tenant');
     }
 
-    if (!tenantSlug) return;
+    if (!tenantSlug) {
+        if(document.body) { document.body.style.opacity = '1'; document.body.style.visibility = 'visible'; }
+        return;
+    }
 
     // Busca dados do tenant
     const tenants = JSON.parse(localStorage.getItem('saas_tenants') || '[]');
     const tenant = tenants.find(t => t.slug === tenantSlug);
-    if (!tenant) return;
+    if (!tenant) {
+        if(document.body) { document.body.style.opacity = '1'; document.body.style.visibility = 'visible'; }
+        return;
+    }
 
     const isAdmin = window.location.pathname.includes('admin.html');
+
+    // ========================================================
+    // BILLING BLOCKING LOGIC
+    // ========================================================
+    if (isAdmin) {
+        const masterConfig = JSON.parse(localStorage.getItem('saas_master_config') || '{"pixKey": "", "pixName": ""}');
+        const currentDay = new Date().getDate();
+        const paymentDay = parseInt(tenant.paymentDay || '0', 10);
+        const isDue = tenant.paymentStatus === 'pendente' && paymentDay > 0 && currentDay >= paymentDay;
+
+        if (isDue) {
+            // Se estiver bloqueado, limpa a tela e mostra a mensagem de cobrança
+            document.body.innerHTML = `
+                <div style="min-height: 100vh; background-color: #0E0E0E; display: flex; align-items: center; justify-content: center; padding: 20px; font-family: sans-serif;">
+                    <div style="background-color: #1A1A1A; border: 2px solid #ef4444; padding: 40px; max-width: 500px; width: 100%; position: relative; text-align: center;">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 8px; background-color: #ef4444;"></div>
+                        <h2 style="font-size: 32px; color: #ef4444; margin-bottom: 10px; font-weight: bold; text-transform: uppercase;">Acesso Bloqueado</h2>
+                        <p style="color: #d1d5db; margin-bottom: 30px;">Mensalidade Pendente</p>
+                        
+                        <p style="color: #9ca3af; font-size: 14px; margin-bottom: 20px;">
+                            O pagamento referente ao dia <strong>${tenant.paymentDay}</strong> consta como pendente em nosso sistema.
+                        </p>
+
+                        <div style="background-color: #000; border: 1px solid #333; padding: 20px; margin-bottom: 20px;">
+                            <p style="color: #F6C500; font-size: 12px; text-transform: uppercase; font-weight: bold; margin-bottom: 10px;">Chave PIX para Pagamento</p>
+                            <p style="color: #fff; font-family: monospace; font-size: 18px; user-select: all;">${masterConfig.pixKey || 'Não configurada'}</p>
+                            ${masterConfig.pixName ? `<p style="color: #6b7280; font-size: 12px; margin-top: 10px; font-weight: bold; text-transform: uppercase;">Favorecido: <span style="color: #d1d5db;">${masterConfig.pixName}</span></p>` : ''}
+                        </div>
+                        
+                        <p style="color: #6b7280; font-size: 12px;">Realize o pagamento e envie o comprovante para o administrador liberar seu acesso.</p>
+                    </div>
+                </div>
+            `;
+            document.body.style.opacity = '1';
+            document.body.style.visibility = 'visible';
+            return; // Impede que o resto do script rode
+        }
+    }
 
     // ========================================================
     // BLOCO STOREFRONT (apenas para páginas que não são admin)
@@ -30,9 +74,10 @@ function initSaas() {
             document.documentElement.style.setProperty('--cf-yellow', tenant.primaryColor);
         }
 
-        // 2. Aplica Fontes Dinâmicas (Títulos e Corpo separadamente)
+        // 2. Aplica Fontes Dinâmicas (Títulos, Corpo e Hero separadamente)
         let fontName = tenant.fontFamily || 'Inter';
         let bodyFontName = tenant.bodyFontFamily || 'Inter';
+        let heroFontName = tenant.heroFontFamily || fontName;
 
         // Formatação dos nomes para o Google Fonts
         if (fontName.startsWith('--font-')) fontName = fontName.replace('--font-', '').replace('-', ' ');
@@ -45,9 +90,20 @@ function initSaas() {
         if (bodyFontName.toLowerCase() === 'anton') bodyFontName = 'Anton';
         if (bodyFontName.toLowerCase() === 'permanent marker') bodyFontName = 'Permanent Marker';
 
-        // Carrega do Google Fonts as duas fontes (se forem diferentes)
+        if (heroFontName.startsWith('--font-')) heroFontName = heroFontName.replace('--font-', '').replace('-', ' ');
+        if (heroFontName.toLowerCase() === 'inter') heroFontName = 'Inter';
+        if (heroFontName.toLowerCase() === 'anton') heroFontName = 'Anton';
+        if (heroFontName.toLowerCase() === 'permanent marker') heroFontName = 'Permanent Marker';
+
+        let subFontName = tenant.heroSubtitleFont || bodyFontName;
+        if (subFontName.startsWith('--font-')) subFontName = subFontName.replace('--font-', '').replace('-', ' ');
+        if (subFontName.toLowerCase() === 'inter') subFontName = 'Inter';
+        if (subFontName.toLowerCase() === 'anton') subFontName = 'Anton';
+        if (subFontName.toLowerCase() === 'permanent marker') subFontName = 'Permanent Marker';
+
+        // Carrega do Google Fonts as fontes
         const link = document.createElement('link');
-        const fontsToLoad = [...new Set([fontName, bodyFontName])].map(f => f.replace(/ /g, '+')).join('&family=');
+        const fontsToLoad = [...new Set([fontName, bodyFontName, heroFontName, subFontName])].map(f => f.replace(/ /g, '+')).join('&family=');
         link.href = `https://fonts.googleapis.com/css2?family=${fontsToLoad}&display=swap`;
         link.rel = 'stylesheet';
         document.head.appendChild(link);
@@ -55,26 +111,36 @@ function initSaas() {
         // Sobrescreve as classes do Tailwind baseadas nas fontes do HTML antigo
         const style = document.createElement('style');
         style.innerHTML = `
-            body, p, span, h3, h4, h5, h6, .font-body { font-family: "${bodyFontName}", sans-serif !important; }
+            body, p, h3, h4, h5, h6, .font-body { font-family: "${bodyFontName}", sans-serif !important; }
             h1, h2, .font-impact { font-family: "${fontName}", sans-serif !important; }
+            #hero-title, #hero-title span { font-family: "${heroFontName}", sans-serif !important; }
+            #hero-subtitle { font-family: "${subFontName}", sans-serif !important; }
             .font-street { font-family: "${fontName}", cursive !important; }
         `;
         document.head.appendChild(style);
 
         // 3. Aplica Logo Dinâmica
-        if (tenant.logoUrl) {
-            document.querySelectorAll('img').forEach(img => {
-                if (img.src.includes('Logonova.jpeg') || img.src.includes('logo')) {
-                    img.src = tenant.logoUrl;
-                    img.classList.remove('mix-blend-screen');
-                    img.style.objectFit = 'contain';
+        if (tenant.logoUrl || tenant.logoSize) {
+            document.querySelectorAll('.saas-logo, img[src*="Logonova.jpeg"], img[src*="logo"]').forEach(img => {
+                if (tenant.logoUrl) img.src = tenant.logoUrl;
+                img.classList.remove('mix-blend-screen');
+                img.style.objectFit = 'contain';
+                if (tenant.logoSize) {
+                    img.style.transform = `scale(${parseInt(tenant.logoSize) / 100})`;
+                    img.style.transformOrigin = 'center';
                 }
             });
         }
 
-        if (tenant.heroImageUrl) {
-            const heroImage = document.getElementById('saas-hero-image');
-            if (heroImage) heroImage.src = tenant.heroImageUrl;
+        if (tenant.heroImageUrl || tenant.heroImageSize) {
+            const heroImage = document.querySelector('img[src*="hero-image"], #saas-hero-image');
+            if (heroImage) {
+                if (tenant.heroImageUrl) heroImage.src = tenant.heroImageUrl;
+                if (tenant.heroImageSize) {
+                    heroImage.style.transform = `scale(${parseInt(tenant.heroImageSize) / 100})`;
+                    heroImage.style.transformOrigin = 'center';
+                }
+            }
         }
 
         // Altera nome da loja no título
@@ -112,6 +178,29 @@ function initSaas() {
                     spans[2].innerText = tenant.heroWord3 || defaults[2];
                     spans[3].innerText = tenant.heroWord4 || defaults[3];
 
+                    // Aplica cor e tamanho customizados
+                    if (tenant.heroFontColor && tenant.heroFontColor !== '#ffffff') {
+                        spans.forEach(span => {
+                            if (!span.classList.contains('text-cf-yellow')) {
+                                span.style.color = tenant.heroFontColor;
+                            }
+                        });
+                    }
+                    if (tenant.heroFontSize && tenant.heroFontSize !== '100') {
+                        const scale = parseInt(tenant.heroFontSize) / 100;
+                        heroTitle.style.zoom = scale;
+                        
+                        // Fallback constraint just in case it still tries to overflow
+                        heroTitle.style.maxWidth = "100%";
+                        heroTitle.style.overflowWrap = "break-word";
+                        heroTitle.style.wordBreak = "break-word";
+                        
+                        // Force spans to break if they contain long strings
+                        spans.forEach(span => {
+                            span.style.whiteSpace = "normal";
+                        });
+                    }
+
                     // Oculta spans vazios
                     spans.forEach(span => {
                         if (!span.innerText.trim()) {
@@ -120,6 +209,39 @@ function initSaas() {
                             span.style.display = 'block';
                         }
                     });
+                }
+            }
+
+            let subtitleEl = document.getElementById('hero-subtitle');
+            
+            // Se o tema não tiver o subtítulo nativamente, injetamos ele
+            if (!subtitleEl && heroTitle) {
+                subtitleEl = document.createElement('p');
+                subtitleEl.id = 'hero-subtitle';
+                subtitleEl.className = 'font-body text-gray-300 text-sm sm:text-base lg:text-lg max-w-md mt-4 font-semibold';
+                heroTitle.insertAdjacentElement('afterend', subtitleEl);
+            }
+
+            if (subtitleEl && tenant.heroSubtitle !== undefined) {
+                subtitleEl.innerText = tenant.heroSubtitle;
+                if (!tenant.heroSubtitle.trim()) {
+                    subtitleEl.style.display = 'none';
+                } else {
+                    subtitleEl.style.display = 'block';
+                }
+                if (tenant.heroSubtitleSize && tenant.heroSubtitleSize !== '100') {
+                    subtitleEl.style.zoom = parseInt(tenant.heroSubtitleSize) / 100;
+                }
+            }
+
+            if (tenant.heroImageUrl || tenant.heroImageSize) {
+                const heroImg = document.querySelector('img[src*="hero-image"], #saas-hero-image');
+                if (heroImg) {
+                    if (tenant.heroImageUrl) heroImg.src = tenant.heroImageUrl;
+                    if (tenant.heroImageSize) {
+                        heroImg.style.transform = `scale(${parseInt(tenant.heroImageSize) / 100})`;
+                        heroImg.style.transformOrigin = 'center';
+                    }
                 }
             }
         }
@@ -131,13 +253,18 @@ function initSaas() {
         switch (tenant.theme) {
             case 'design2':
                 cssRules = `
-                    * { clip-path: none !important; border-radius: 0 !important; }
-                    #products-container > div, .bg-cf-darkgray, button {
+                    *:not(.rounded-full) { clip-path: none !important; border-radius: 0 !important; }
+                    #products-container > div, .bg-cf-darkgray, button:not(#floating-cart) {
                         border: 2px solid #fff !important;
                         box-shadow: 6px 6px 0 var(--yellow) !important;
                         transition: transform 0.1s, box-shadow 0.1s !important;
                     }
-                    button:active {
+                    #saas-hero-image {
+                        border: 12px solid var(--yellow) !important;
+                        box-shadow: 0 0 0 3px #111, 24px 24px 0 #fff, 24px 24px 0 3px #111 !important;
+                        border-radius: 0 !important;
+                    }
+                    button:not(#floating-cart):active {
                         transform: translate(4px, 4px) !important;
                         box-shadow: 2px 2px 0 var(--yellow) !important;
                     }
@@ -188,20 +315,20 @@ function initSaas() {
                     .border-2, .border { border: none !important; }
                     .torn-edge { clip-path: none !important; }
                     .bg-cf-darkgray { background-color: #1a1a1a !important; }
-                    button { box-shadow: none !important; border-radius: 4px !important; }
+                    button:not(#floating-cart) { box-shadow: none !important; border-radius: 4px !important; }
                 `;
                 break;
             case 'design8':
                 cssRules = `
                     h3.font-bold.text-xl { font-size: 1.8rem !important; line-height: 1.2 !important; }
                     .text-cf-yellow.font-bold { font-size: 2rem !important; }
-                    button { font-size: 1.2rem !important; padding: 1rem 2rem !important; }
+                    button:not(#floating-cart) { font-size: 1.2rem !important; padding: 1rem 2rem !important; }
                 `;
                 break;
             case 'design9':
                 cssRules = `
-                    * { border-radius: 12px !important; clip-path: none !important; }
-                    button { border-radius: 20px !important; }
+                    *:not(.rounded-full) { border-radius: 12px !important; clip-path: none !important; }
+                    button:not(#floating-cart) { border-radius: 20px !important; }
                     .torn-edge { clip-path: none !important; border-radius: 12px !important; }
                 `;
                 break;
@@ -260,8 +387,29 @@ function initSaas() {
 
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs uppercase font-bold text-gray-400 mb-2">URL do Logo da Franquia</label>
-                                <input type="text" id="saas-logo" value="${tenant.logoUrl || ''}" class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold focus:border-cf-yellow outline-none transition-colors" placeholder="https://site.com/logo.png">
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Logo da Franquia (Upload)</label>
+                                <input type="file" accept="image/*" id="saas-logo-file" class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold focus:border-cf-yellow outline-none transition-colors cursor-pointer">
+                                <div id="saas-logo-preview-container" class="${tenant.logoUrl ? 'mt-4 p-2 bg-black border border-cf-gray rounded inline-block' : 'hidden'}">
+                                    <p class="text-xs text-gray-400 mb-2">Preview da Logo:</p>
+                                    <img id="saas-logo-preview" src="${tenant.logoUrl || ''}" class="h-16 object-contain bg-white/10 p-2 rounded">
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-xs text-gray-400 mb-1">Tamanho da Logo: <span id="saas-logo-size-label">${tenant.logoSize || '100'}</span>%</label>
+                                    <input type="range" min="50" max="250" step="5" value="${tenant.logoSize || '100'}" id="saas-logo-size" class="w-full max-w-sm accent-cf-yellow cursor-pointer" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Imagem da Página Inicial (Hero Image)</label>
+                                <input type="file" accept="image/*" id="saas-hero-file" class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold focus:border-cf-yellow outline-none transition-colors cursor-pointer">
+                                <div id="saas-hero-preview-container" class="${tenant.heroImageUrl ? 'mt-4 p-2 bg-black border border-cf-gray rounded inline-block' : 'hidden'}">
+                                    <p class="text-xs text-gray-400 mb-2">Preview da Imagem:</p>
+                                    <img id="saas-hero-preview" src="${tenant.heroImageUrl || ''}" class="h-24 object-contain">
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-xs text-gray-400 mb-1">Tamanho da Imagem: <span id="saas-hero-image-size-label">${tenant.heroImageSize || '100'}</span>%</label>
+                                    <input type="range" min="50" max="150" step="5" value="${tenant.heroImageSize || '100'}" id="saas-hero-image-size" class="w-full max-w-sm accent-cf-yellow cursor-pointer" />
+                                </div>
                             </div>
 
                             <div class="bg-cf-black p-4 border border-cf-gray rounded space-y-3 mt-4">
@@ -284,6 +432,44 @@ function initSaas() {
                                         <input type="text" id="saas-hero-4" value="${(tenant.heroWord4 !== undefined && tenant.heroWord4 !== '') ? tenant.heroWord4 : (themeDefaults[tenant.theme || 'design1'] || themeDefaults['design1'])[3]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                 </div>
+                                <div class="mt-4">
+                                    <label class="block text-xs text-gray-400 mb-1">Subtítulo (Abaixo das palavras)</label>
+                                    <textarea id="saas-hero-subtitle" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-2 text-sm outline-none resize-none" rows="2" placeholder="Marmitas fitness reais...">${tenant.heroSubtitle !== undefined ? tenant.heroSubtitle : 'Marmitas fitness reais para quem treina de verdade. Sem glúten, sem lactose.'}</textarea>
+                                    <div class="grid grid-cols-2 gap-4 mt-2">
+                                        <div>
+                                            <label class="block text-xs text-gray-400 mb-1">Tipografia do Subtítulo</label>
+                                            <select id="saas-hero-subtitle-font" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                                <option value="Inter" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Inter' ? 'selected' : ''}>Inter (Moderna)</option>
+                                                <option value="Anton" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Anton' ? 'selected' : ''}>Anton (Ousada)</option>
+                                                <option value="Permanent Marker" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Permanent Marker' ? 'selected' : ''}>Permanent Marker</option>
+                                                <option value="Roboto" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Roboto' ? 'selected' : ''}>Roboto</option>
+                                                <option value="Montserrat" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Montserrat' ? 'selected' : ''}>Montserrat</option>
+                                                <option value="Poppins" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Poppins' ? 'selected' : ''}>Poppins</option>
+                                                <option value="Lato" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Lato' ? 'selected' : ''}>Lato</option>
+                                                <option value="Oswald" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Oswald' ? 'selected' : ''}>Oswald</option>
+                                                <option value="Playfair Display" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Playfair Display' ? 'selected' : ''}>Playfair</option>
+                                                <option value="Fredoka One" ${(tenant.heroSubtitleFont || tenant.bodyFontFamily || tenant.fontFamily) === 'Fredoka One' ? 'selected' : ''}>Fredoka One</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-400 mb-1">Tamanho: <span id="saas-hero-subtitle-size-label">${tenant.heroSubtitleSize || '100'}</span>%</label>
+                                            <input type="range" id="saas-hero-subtitle-size" min="50" max="250" step="5" value="${tenant.heroSubtitleSize || '100'}" class="w-full accent-cf-yellow cursor-pointer">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-cf-gray mt-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-400 mb-1">Cor do Texto Principal</label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="color" id="saas-hero-color" value="${tenant.heroFontColor || '#ffffff'}" class="h-8 w-12 cursor-pointer bg-cf-darkgray border border-cf-gray">
+                                            <span class="text-xs font-mono text-gray-400" id="saas-hero-color-hex">${tenant.heroFontColor || '#ffffff'}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-400 mb-1">Tamanho da Fonte: <span id="saas-hero-size-label">${tenant.heroFontSize || '100'}</span>%</label>
+                                        <input type="range" id="saas-hero-size" min="50" max="150" step="5" value="${tenant.heroFontSize || '100'}" class="w-full accent-cf-yellow cursor-pointer">
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="flex gap-4 mt-4">
@@ -300,8 +486,8 @@ function initSaas() {
                                 </div>
                             </div>
 
-                            <div class="flex gap-4 mt-4">
-                                <div class="flex-1">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                <div>
                                     <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Tipografia (Títulos)</label>
                                     <select id="saas-font" class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold focus:border-cf-yellow outline-none">
                                         <option value="Inter" ${tenant.fontFamily === 'Inter' ? 'selected' : ''}>1. Inter (Moderna / Neutra)</option>
@@ -316,16 +502,34 @@ function initSaas() {
                                         <option value="Fredoka One" ${tenant.fontFamily === 'Fredoka One' ? 'selected' : ''}>10. Fredoka (Descontraída / Fun)</option>
                                     </select>
                                 </div>
-                                <div class="flex-1">
+                                <div>
                                     <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Tipografia (Corpo/Cardápio)</label>
                                     <select id="saas-body-font" class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold focus:border-cf-yellow outline-none">
                                         <option value="Inter" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Inter' ? 'selected' : ''}>1. Inter (Moderna / Neutra)</option>
-                                        <option value="Roboto" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Roboto' ? 'selected' : ''}>2. Roboto (Clássica do Google)</option>
-                                        <option value="Montserrat" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Montserrat' ? 'selected' : ''}>3. Montserrat (Geométrica / Elegante)</option>
-                                        <option value="Poppins" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Poppins' ? 'selected' : ''}>4. Poppins (Arredondada / Amigável)</option>
-                                        <option value="Lato" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Lato' ? 'selected' : ''}>5. Lato (Leve e Harmônica)</option>
-                                        <option value="Oswald" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Oswald' ? 'selected' : ''}>6. Oswald (Alta e Fina)</option>
-                                        <option value="Arial" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Arial' ? 'selected' : ''}>7. Arial (Clássica)</option>
+                                        <option value="Anton" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Anton' ? 'selected' : ''}>2. Anton (Ousada / Impacto)</option>
+                                        <option value="Permanent Marker" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Permanent Marker' ? 'selected' : ''}>3. Permanent Marker (Urbana / Street)</option>
+                                        <option value="Roboto" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Roboto' ? 'selected' : ''}>4. Roboto (Clássica do Google)</option>
+                                        <option value="Montserrat" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Montserrat' ? 'selected' : ''}>5. Montserrat (Geométrica / Elegante)</option>
+                                        <option value="Poppins" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Poppins' ? 'selected' : ''}>6. Poppins (Arredondada / Amigável)</option>
+                                        <option value="Lato" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Lato' ? 'selected' : ''}>7. Lato (Leve e Harmônica)</option>
+                                        <option value="Oswald" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Oswald' ? 'selected' : ''}>8. Oswald (Alta e Fina / Revista)</option>
+                                        <option value="Playfair Display" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Playfair Display' ? 'selected' : ''}>9. Playfair Display (Serifada Clássica)</option>
+                                        <option value="Fredoka One" ${(tenant.bodyFontFamily || tenant.fontFamily) === 'Fredoka One' ? 'selected' : ''}>10. Fredoka (Descontraída / Fun)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Tipografia (Frase Hero)</label>
+                                    <select id="saas-hero-font" class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold focus:border-cf-yellow outline-none">
+                                        <option value="Inter" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Inter' ? 'selected' : ''}>1. Inter (Moderna / Neutra)</option>
+                                        <option value="Anton" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Anton' ? 'selected' : ''}>2. Anton (Ousada / Impacto)</option>
+                                        <option value="Permanent Marker" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Permanent Marker' ? 'selected' : ''}>3. Permanent Marker (Urbana / Street)</option>
+                                        <option value="Roboto" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Roboto' ? 'selected' : ''}>4. Roboto (Clássica do Google)</option>
+                                        <option value="Montserrat" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Montserrat' ? 'selected' : ''}>5. Montserrat (Geométrica / Elegante)</option>
+                                        <option value="Poppins" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Poppins' ? 'selected' : ''}>6. Poppins (Arredondada / Amigável)</option>
+                                        <option value="Lato" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Lato' ? 'selected' : ''}>7. Lato (Leve e Harmônica)</option>
+                                        <option value="Oswald" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Oswald' ? 'selected' : ''}>8. Oswald (Alta e Fina / Revista)</option>
+                                        <option value="Playfair Display" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Playfair Display' ? 'selected' : ''}>9. Playfair Display (Serifada Clássica)</option>
+                                        <option value="Fredoka One" ${(tenant.heroFontFamily || tenant.fontFamily) === 'Fredoka One' ? 'selected' : ''}>10. Fredoka (Descontraída / Fun)</option>
                                     </select>
                                 </div>
                             </div>
@@ -356,6 +560,51 @@ function initSaas() {
                 document.getElementById('saas-color').addEventListener('input', (e) => {
                     document.getElementById('saas-color-hex').innerText = e.target.value;
                 });
+                document.getElementById('saas-hero-color').addEventListener('input', (e) => {
+                    document.getElementById('saas-hero-color-hex').innerText = e.target.value;
+                });
+                document.getElementById('saas-hero-size').addEventListener('input', (e) => {
+                    document.getElementById('saas-hero-size-label').innerText = e.target.value;
+                });
+                document.getElementById('saas-logo-size').addEventListener('input', (e) => {
+                    document.getElementById('saas-logo-size-label').innerText = e.target.value;
+                });
+                document.getElementById('saas-hero-image-size').addEventListener('input', (e) => {
+                    document.getElementById('saas-hero-image-size-label').innerText = e.target.value;
+                });
+                document.getElementById('saas-hero-subtitle-size').addEventListener('input', (e) => {
+                    document.getElementById('saas-hero-subtitle-size-label').innerText = e.target.value;
+                });
+
+                // File Upload Base64 Logic
+                let currentLogoBase64 = tenant.logoUrl || '';
+                let currentHeroBase64 = tenant.heroImageUrl || '';
+
+                document.getElementById('saas-logo-file').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            currentLogoBase64 = reader.result;
+                            document.getElementById('saas-logo-preview').src = currentLogoBase64;
+                            document.getElementById('saas-logo-preview-container').classList.remove('hidden');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                document.getElementById('saas-hero-file').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            currentHeroBase64 = reader.result;
+                            document.getElementById('saas-hero-preview').src = currentHeroBase64;
+                            document.getElementById('saas-hero-preview-container').classList.remove('hidden');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
 
                 // Preenche palavras padrão quando mudar o tema
                 document.getElementById('saas-theme').addEventListener('change', (e) => {
@@ -377,16 +626,25 @@ function initSaas() {
                     if (tenantIdx >= 0) {
                         tenantsList[tenantIdx] = {
                             ...tenantsList[tenantIdx],
-                            logoUrl: document.getElementById('saas-logo').value,
+                            logoUrl: currentLogoBase64,
+                            logoSize: document.getElementById('saas-logo-size').value,
+                            heroImageUrl: currentHeroBase64,
                             primaryColor: document.getElementById('saas-color').value,
                             mercadoPagoKey: document.getElementById('saas-mp-key').value,
                             fontFamily: document.getElementById('saas-font').value,
                             bodyFontFamily: document.getElementById('saas-body-font').value,
+                            heroFontFamily: document.getElementById('saas-hero-font').value,
                             theme: document.getElementById('saas-theme').value,
                             heroWord1: document.getElementById('saas-hero-1').value,
                             heroWord2: document.getElementById('saas-hero-2').value,
                             heroWord3: document.getElementById('saas-hero-3').value,
-                            heroWord4: document.getElementById('saas-hero-4').value
+                            heroWord4: document.getElementById('saas-hero-4').value,
+                            heroSubtitle: document.getElementById('saas-hero-subtitle').value,
+                            heroSubtitleFont: document.getElementById('saas-hero-subtitle-font').value,
+                            heroSubtitleSize: document.getElementById('saas-hero-subtitle-size').value,
+                            heroFontColor: document.getElementById('saas-hero-color').value,
+                            heroFontSize: document.getElementById('saas-hero-size').value,
+                            heroImageSize: document.getElementById('saas-hero-image-size').value
                         };
                         localStorage.setItem('saas_tenants', JSON.stringify(tenantsList));
 
@@ -400,6 +658,14 @@ function initSaas() {
         // Timeout de segurança: cancela o intervalo após 10 segundos para não ficar rodando infinitamente
         setTimeout(() => clearInterval(checkExist), 10000);
     }
+
+    // Após processar tudo, mostra a página
+    setTimeout(() => {
+        if(document.body) {
+            document.body.style.opacity = '1';
+            document.body.style.visibility = 'visible';
+        }
+    }, 50);
 }
 
 if (document.readyState === 'loading') {

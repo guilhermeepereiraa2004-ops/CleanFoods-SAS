@@ -81,14 +81,14 @@
           "sameAs": [
             "https://wa.me/5511910993953"
           ],
-          "hasMenu": "https://www.cleanfoodsp.com.br/cardapio-completo.html"
+          "hasMenu": "https://www.cleanfoodsp.com.br/#cardapio"
         },
         {
           "@type": "Menu",
           "@id": "https://www.cleanfoodsp.com.br/#menu",
           "name": "Cardápio CleanFoods",
           "description": "Marmitas fitness com frango, patinho bovino e opções gourmet, nos tamanhos P e G.",
-          "url": "https://www.cleanfoodsp.com.br/cardapio-completo.html",
+          "url": "https://www.cleanfoodsp.com.br/#cardapio",
           "hasMenuSection": [
             {
               "@type": "MenuSection",
@@ -592,7 +592,7 @@
             }
 
             #hero-title {
-                font-size: clamp(3rem, 13vh, 9.5rem) !important;
+                font-size: clamp(3rem, min(6.5vw, 10vh), 9.5rem) !important;
                 line-height: 0.85 !important;
             }
 
@@ -605,7 +605,7 @@
             }
 
             #hero-image-container {
-                max-width: clamp(450px, 85vh, 1000px) !important;
+                max-width: clamp(350px, min(42vw, 75vh), 1000px) !important;
             }
 
             #hero-subtitle {
@@ -619,6 +619,7 @@
             }
         }
     </style>
+<style id='saas-fouc-preventer'>body { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }</style>
 </head>
 
 <body class="antialiased font-body relative">
@@ -630,7 +631,7 @@
     <!-- Floating Cardapio Button -->
     <div id="floating-cardapio-btn"
         class="fixed bottom-6 left-6 z-40 opacity-0 pointer-events-none transform translate-y-24 scale-75 transition-all duration-500 ease-out">
-        <a href="cardapio-completo.html"
+        <a href="#cardapio"
             class="bg-cf-yellow text-cf-black font-impact text-xl sm:text-2xl uppercase tracking-wider px-6 py-4 border-4 border-cf-black hover:border-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(246,197,0,0.8)] cursor-hover btn-attention">
             <i class="fa-solid fa-book-open mr-2"></i> CARDÁPIO
         </a>
@@ -658,19 +659,26 @@
 
         <a href="#hero" class="cursor-hover flex justify-center -mt-2 md:-mt-6">
             <img src="Logonova.jpeg" alt="Cleanfoods Logo"
-                class="h-28 sm:h-36 md:h-44 lg:h-64 w-auto max-w-none md:max-w-full object-contain transition-all">
+                class="saas-logo h-28 sm:h-36 md:h-44 lg:h-64 w-auto max-w-none md:max-w-full object-contain transition-all">
         </a>
 
         <div class="flex items-center justify-end gap-3 sm:gap-4 md:gap-6 mt-1 md:mt-0">
 
-            <a href="admin.html"
+            <a href="#" onclick="window.parent.location.href = '/' + (sessionStorage.getItem('active_tenant') || '') + '/admin'; return false;"
                 class="font-impact text-[10px] sm:text-xs md:text-sm text-cf-black bg-white hover:bg-cf-yellow border border-white hover:border-cf-yellow px-2 py-1 transition-colors tracking-wider cursor-hover uppercase rounded-sm flex items-center gap-1 shadow-md">
                 ADMIN <i class="fa-solid fa-user-gear text-[10px]"></i>
             </a>
         </div>
     </header>
 
-    <section class="relative min-h-screen flex items-center justify-center pb-12 bg-cf-black" id="hero">
+    <section class="relative min-h-screen flex items-center justify-center pb-12 bg-cf-black overflow-hidden" id="hero">
+        <!-- Textura de Fundo: Nome CleanFoods -->
+        <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-[0.03] select-none overflow-hidden" aria-hidden="true">
+            <div id="saas-hero-bg-text" class="text-[8rem] md:text-[14rem] lg:text-[18rem] font-black leading-[0.8] text-transparent tracking-tighter text-justify break-all" style="-webkit-text-stroke: 3px #ffffff; font-family: 'Anton', sans-serif; width: 120vw; transform: rotate(-2deg) scale(1.2);">
+                CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS CLEANFOODS
+            </div>
+        </div>
+
         <div class="container mx-auto px-4 relative z-10 pt-24 grid lg:grid-cols-[55%_45%] gap-8 lg:gap-12 items-center">
             <div class="relative z-20">
                 <h1 id="hero-title" class="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.9] text-white uppercase tracking-tighter w-full">
@@ -683,8 +691,8 @@
                     <a href="#cardapio" class="inline-block bg-cf-yellow text-cf-black px-8 py-4 md:px-10 md:py-5 text-lg md:text-xl font-bold uppercase hover:bg-white hover:text-black transition duration-300">Fazer Pedido <i class="fa-solid fa-arrow-right ml-2"></i></a>
                 </div>
             </div>
-            <div class="relative w-full h-[400px] md:h-[500px] lg:h-[600px] flex justify-end z-10">
-                <img id="saas-hero-image" src="Marmita monstro.png" class="w-full h-full object-contain filter drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] lg:object-right" alt="Produto Hero" />
+            <div class="relative w-full flex justify-end items-center z-10 py-12 lg:py-0">
+                <img id="saas-hero-image" src="Marmita monstro.png" class="w-[95%] lg:w-[115%] xl:w-[125%] max-w-[850px] h-auto object-contain mx-auto lg:mx-0 lg:-ml-10 relative z-20" alt="Produto Hero" />
             </div>
         </div>
     </section>
@@ -811,7 +819,7 @@
                     NO EXCUSES
                 </div>
                 <div class="mt-8">
-                    <a href="cardapio-completo.html" class="btn-street cursor-hover">
+                    <a href="#cardapio" class="btn-street cursor-hover">
                         PEDIR AGORA
                     </a>
                 </div>
@@ -3524,7 +3532,7 @@ if (typeof renderMenu === 'function') renderMenu();
 
         function selectCombo(goal) {
             localStorage.setItem('cleanfoods_combo_goal', goal);
-            window.location.href = 'cardapio-completo.html?promo=active';
+            window.location.href = '#cardapio';
         }
     </script>
     <!-- Custom Alert Modal (Overwrites default window.alert) -->
@@ -3650,3 +3658,4 @@ if (typeof renderMenu === 'function') renderMenu();
     <script src="saas-injector.js"></script>
 </body>
 </html>
+
