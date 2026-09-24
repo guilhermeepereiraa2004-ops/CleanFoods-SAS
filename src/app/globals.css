@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0E0E0E;
+  --foreground: #ffffff;
+  
+  --cf-black: #0E0E0E;
+  --cf-yellow: #F6C500;
+  --cf-darkgray: #1A1A1A;
+  --cf-gray: #333333;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cf-black: var(--cf-black);
+  --color-cf-yellow: var(--cf-yellow);
+  --color-cf-darkgray: var(--cf-darkgray);
+  --color-cf-gray: var(--cf-gray);
+
+  --font-impact: 'Anton', sans-serif;
+  --font-street: 'Permanent Marker', cursive;
+  --font-body: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cf-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cf-yellow);
+}
+
+.torn-edge {
+  clip-path: polygon(0 0, 100% 1%, 99% 100%, 1% 99%);
+}
+
+.noise-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}

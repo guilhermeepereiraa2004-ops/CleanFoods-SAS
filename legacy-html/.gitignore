@@ -1,0 +1,4 @@
+.vercel
+node_modules/
+check_orders.js
+package*.json
