@@ -1,5 +1,7 @@
 'use client';
 
+import { normalizeTenantSlug } from '@/lib/tenants';
+
 // Simula um banco de dados SaaS (Multi-tenant) usando LocalStorage
 export interface Tenant {
   id: string;
@@ -82,7 +84,8 @@ export const deleteTenant = (id: string) => {
 
 export const getTenantBySlug = (slug: string): Tenant | null => {
   const tenants = getTenants();
-  return tenants.find(t => t.slug === slug) || null;
+  const normalizedSlug = normalizeTenantSlug(slug);
+  return tenants.find(t => normalizeTenantSlug(t.slug) === normalizedSlug) || null;
 };
 
 // Initialize with a default tenant if empty

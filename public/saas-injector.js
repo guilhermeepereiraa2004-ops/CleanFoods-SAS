@@ -1,11 +1,12 @@
 // saas-injector.js
 // Injetado nos arquivos HTML originais para habilitar o modo Multi-tenant (Fontes, Cores, Temas)
 
-function initSaas() {
+async function initSaas() {
     const urlParams = new URLSearchParams(window.location.search);
     let tenantSlug = urlParams.get('tenant');
 
     if (tenantSlug) {
+        tenantSlug = tenantSlug.trim().toLowerCase();
         sessionStorage.setItem('active_tenant', tenantSlug);
     } else {
         tenantSlug = sessionStorage.getItem('active_tenant');
@@ -18,10 +19,30 @@ function initSaas() {
 
     // Busca dados do tenant
     const tenants = JSON.parse(localStorage.getItem('saas_tenants') || '[]');
-    const tenant = tenants.find(t => t.slug === tenantSlug);
+    const localTenant = tenants.find(t => (t.slug || '').toLowerCase() === tenantSlug);
+    let remoteTenant = null;
+
+    try {
+        const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`, {
+            cache: 'no-store'
+        });
+        if (response.ok) remoteTenant = await response.json();
+    } catch (error) {
+        console.warn('Não foi possível atualizar os dados públicos da loja.', error);
+    }
+
+    // Os dados locais preservam credenciais e alterações ainda não sincronizadas.
+    const tenant = remoteTenant ? { ...remoteTenant, ...localTenant } : localTenant;
     if (!tenant) {
         if(document.body) { document.body.style.opacity = '1'; document.body.style.visibility = 'visible'; }
         return;
+    }
+
+    if (remoteTenant) {
+        const tenantIdx = tenants.findIndex(t => (t.slug || '').toLowerCase() === tenantSlug);
+        if (tenantIdx >= 0) tenants[tenantIdx] = tenant;
+        else tenants.push(tenant);
+        localStorage.setItem('saas_tenants', JSON.stringify(tenants));
     }
 
     // O primeiro tema foi descontinuado; lojas antigas passam a usar o Tema 2.

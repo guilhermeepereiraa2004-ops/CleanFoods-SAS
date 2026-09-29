@@ -1,12 +1,33 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Tenant, getTenants, saveTenant, deleteTenant, MasterConfig, getMasterConfig, saveMasterConfig } from '@/lib/mockStorage';
-import { logoutMaster } from './actions';
+import { normalizeTenantSlug } from '@/lib/tenants';
+import {
+  deleteMasterTenant,
+  loadMasterTenants,
+  logoutMaster,
+  saveMasterTenant,
+  type MasterTenantInput,
+} from './actions';
 
 const subscribeToClient = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
+
+function toMasterTenantInput(tenant: Tenant): MasterTenantInput {
+  return {
+    id: tenant.id, slug: tenant.slug, name: tenant.name, logoUrl: tenant.logoUrl,
+    theme: tenant.theme, primaryColor: tenant.primaryColor, fontFamily: tenant.fontFamily,
+    bodyFontFamily: tenant.bodyFontFamily, heroFontFamily: tenant.heroFontFamily,
+    heroWord1: tenant.heroWord1, heroWord2: tenant.heroWord2, heroWord3: tenant.heroWord3,
+    heroWord4: tenant.heroWord4, heroImageUrl: tenant.heroImageUrl,
+    heroFontColor: tenant.heroFontColor, heroFontSize: tenant.heroFontSize,
+    heroImageSize: tenant.heroImageSize, heroSubtitle: tenant.heroSubtitle,
+    heroSubtitleFont: tenant.heroSubtitleFont, heroSubtitleSize: tenant.heroSubtitleSize,
+    logoSize: tenant.logoSize, paymentDay: tenant.paymentDay, paymentStatus: tenant.paymentStatus,
+  };
+}
 
 export default function MasterAdminPage() {
   const [tenants, setTenants] = useState<Tenant[]>(getTenants);
@@ -24,6 +45,46 @@ export default function MasterAdminPage() {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function synchronizeTenants() {
+      const localTenants = getTenants();
+      const legacyTenants = localTenants
+        .filter((tenant) => tenant.id !== 'tenant-1')
+        .map(toMasterTenantInput);
+
+      try {
+        const databaseTenants = await loadMasterTenants(legacyTenants);
+        if (cancelled) return;
+
+        const synchronized = databaseTenants.map((databaseTenant) => {
+          const localTenant = localTenants.find(
+            (tenant) => normalizeTenantSlug(tenant.slug) === databaseTenant.slug,
+          );
+          const tenant: Tenant = {
+            ...databaseTenant,
+            adminUser: localTenant?.adminUser,
+            adminPassword: localTenant?.adminPassword,
+            mercadoPagoKey: localTenant?.mercadoPagoKey,
+          };
+          saveTenant(tenant);
+          return tenant;
+        });
+
+        setTenants(synchronized);
+        if (legacyTenants.length > 0) showToast('Lojas sincronizadas com o Supabase!');
+      } catch (error) {
+        if (!cancelled) {
+          showToast(error instanceof Error ? error.message : 'Falha ao sincronizar as lojas.');
+        }
+      }
+    }
+
+    void synchronizeTenants();
+    return () => { cancelled = true; };
+  }, []);
+
   // Form states
   const [newTenant, setNewTenant] = useState({ 
     name: '', slug: '', adminUser: '', adminPassword: '', paymentDay: '' 
@@ -40,14 +101,14 @@ export default function MasterAdminPage() {
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [deleteError, setDeleteError] = useState('');
 
-  const handleCreateTenant = (e: React.FormEvent) => {
+  const handleCreateTenant = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTenant.name || !newTenant.slug || !newTenant.adminUser || !newTenant.adminPassword) return;
     
     const tenant: Tenant = {
       id: crypto.randomUUID(),
       name: newTenant.name,
-      slug: newTenant.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+      slug: normalizeTenantSlug(newTenant.slug),
       theme: 'design2',
       primaryColor: '#F6C500',
       fontFamily: 'Inter',
@@ -58,21 +119,36 @@ export default function MasterAdminPage() {
       createdAt: new Date().toISOString()
     };
     
-    saveTenant(tenant);
-    setTenants(getTenants());
-    setNewTenant({ name: '', slug: '', adminUser: '', adminPassword: '', paymentDay: '' });
-    setActiveModule('franquias');
-    showToast('Franquia criada com sucesso!');
+    try {
+      const savedTenant = await saveMasterTenant(toMasterTenantInput(tenant));
+      saveTenant({ ...savedTenant, adminUser: tenant.adminUser, adminPassword: tenant.adminPassword });
+      setTenants(getTenants().filter((item) => item.id !== 'tenant-1'));
+      setNewTenant({ name: '', slug: '', adminUser: '', adminPassword: '', paymentDay: '' });
+      setActiveModule('franquias');
+      showToast('Franquia criada com sucesso!');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Não foi possível criar a franquia.');
+    }
   };
 
-  const togglePaymentStatus = (tenantId: string) => {
+  const togglePaymentStatus = async (tenantId: string) => {
     const tenant = tenants.find(t => t.id === tenantId);
     if (tenant) {
       const novoStatus = tenant.paymentStatus === 'pago' ? 'pendente' : 'pago';
-      tenant.paymentStatus = novoStatus;
-      saveTenant(tenant);
-      setTenants(getTenants());
-      showToast(`Status alterado para ${novoStatus.toUpperCase()}`);
+      const updatedTenant: Tenant = { ...tenant, paymentStatus: novoStatus };
+      try {
+        const savedTenant = await saveMasterTenant(toMasterTenantInput(updatedTenant));
+        saveTenant({
+          ...savedTenant,
+          adminUser: tenant.adminUser,
+          adminPassword: tenant.adminPassword,
+          mercadoPagoKey: tenant.mercadoPagoKey,
+        });
+        setTenants(getTenants().filter((item) => item.id !== 'tenant-1'));
+        showToast(`Status alterado para ${novoStatus.toUpperCase()}`);
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Não foi possível alterar o status.');
+      }
     }
   };
 
@@ -87,35 +163,51 @@ export default function MasterAdminPage() {
     });
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingTenantId) return;
 
     const tenant = tenants.find(t => t.id === editingTenantId);
     if (tenant) {
-      tenant.name = editTenantForm.name;
-      tenant.slug = editTenantForm.slug;
-      tenant.adminUser = editTenantForm.adminUser;
-      if (editTenantForm.adminPassword) {
-        tenant.adminPassword = editTenantForm.adminPassword;
+      const updatedTenant: Tenant = {
+        ...tenant,
+        name: editTenantForm.name,
+        slug: normalizeTenantSlug(editTenantForm.slug),
+        adminUser: editTenantForm.adminUser,
+        adminPassword: editTenantForm.adminPassword || tenant.adminPassword,
+        paymentDay: editTenantForm.paymentDay,
+      };
+      try {
+        const savedTenant = await saveMasterTenant(toMasterTenantInput(updatedTenant));
+        saveTenant({
+          ...savedTenant,
+          adminUser: updatedTenant.adminUser,
+          adminPassword: updatedTenant.adminPassword,
+          mercadoPagoKey: tenant.mercadoPagoKey,
+        });
+        setTenants(getTenants().filter((item) => item.id !== 'tenant-1'));
+        setEditingTenantId(null);
+        showToast('Dados da loja atualizados!');
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Não foi possível atualizar a loja.');
       }
-      tenant.paymentDay = editTenantForm.paymentDay;
-      saveTenant(tenant);
-      setTenants(getTenants());
-      setEditingTenantId(null);
-      showToast('Dados da loja atualizados!');
     }
   };
 
-  const handleDeleteTenant = (e: React.FormEvent) => {
+  const handleDeleteTenant = async (e: React.FormEvent) => {
     e.preventDefault();
     if (tenantToDelete && deleteConfirmation === tenantToDelete.slug) {
-      deleteTenant(tenantToDelete.id);
-      setTenants(getTenants());
-      setTenantToDelete(null);
-      setDeleteConfirmation('');
-      setDeleteError('');
-      showToast('Franquia deletada com sucesso!');
+      try {
+        await deleteMasterTenant(tenantToDelete.id);
+        deleteTenant(tenantToDelete.id);
+        setTenants(getTenants().filter((item) => item.id !== 'tenant-1'));
+        setTenantToDelete(null);
+        setDeleteConfirmation('');
+        setDeleteError('');
+        showToast('Franquia deletada com sucesso!');
+      } catch (error) {
+        setDeleteError(error instanceof Error ? error.message : 'Não foi possível apagar a loja.');
+      }
     } else {
       setDeleteError('Digite o slug exato da loja para confirmar.');
     }
