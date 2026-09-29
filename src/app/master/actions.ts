@@ -8,10 +8,6 @@ export type MasterLoginState = {
   error: string;
 };
 
-export const initialMasterLoginState: MasterLoginState = {
-  error: '',
-};
-
 export async function loginMaster(
   _previousState: MasterLoginState,
   formData: FormData,

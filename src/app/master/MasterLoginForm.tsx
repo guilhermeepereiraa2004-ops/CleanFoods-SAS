@@ -4,7 +4,6 @@ import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import {
-  initialMasterLoginState,
   loginMaster,
   type MasterLoginState,
 } from './actions';
@@ -29,7 +28,6 @@ export default function MasterLoginForm({
   initialError?: string;
 }) {
   const initialState: MasterLoginState = {
-    ...initialMasterLoginState,
     error: initialError,
   };
   const [state, formAction] = useActionState(loginMaster, initialState);
