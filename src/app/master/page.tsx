@@ -17,16 +17,7 @@ const getServerSnapshot = () => false;
 
 function toMasterTenantInput(tenant: Tenant): MasterTenantInput {
   return {
-    id: tenant.id, slug: tenant.slug, name: tenant.name, logoUrl: tenant.logoUrl,
-    theme: tenant.theme, primaryColor: tenant.primaryColor, fontFamily: tenant.fontFamily,
-    bodyFontFamily: tenant.bodyFontFamily, heroFontFamily: tenant.heroFontFamily,
-    heroWord1: tenant.heroWord1, heroWord2: tenant.heroWord2, heroWord3: tenant.heroWord3,
-    heroWord4: tenant.heroWord4, heroImageUrl: tenant.heroImageUrl,
-    heroFontColor: tenant.heroFontColor, heroFontSize: tenant.heroFontSize,
-    heroImageSize: tenant.heroImageSize, heroSubtitle: tenant.heroSubtitle,
-    heroSubtitleFont: tenant.heroSubtitleFont, heroSubtitleSize: tenant.heroSubtitleSize,
-    logoSize: tenant.logoSize, footerCopyright: tenant.footerCopyright,
-    footerCnpj: tenant.footerCnpj, paymentDay: tenant.paymentDay,
+    id: tenant.id, slug: tenant.slug, name: tenant.name, paymentDay: tenant.paymentDay,
     paymentStatus: tenant.paymentStatus,
   };
 }
@@ -52,17 +43,15 @@ export default function MasterAdminPage() {
 
     async function synchronizeTenants() {
       const localTenants = getTenants();
-      const legacyTenants = localTenants
-        .filter((tenant) => tenant.id !== 'tenant-1')
-        .map(toMasterTenantInput);
 
       try {
-        const databaseTenants = await loadMasterTenants(legacyTenants);
+        const databaseTenants = await loadMasterTenants();
         if (cancelled) return;
 
         const synchronized = databaseTenants.map((databaseTenant) => {
           const localTenant = localTenants.find(
-            (tenant) => normalizeTenantSlug(tenant.slug) === databaseTenant.slug,
+            (tenant) => tenant.id === databaseTenant.id
+              || normalizeTenantSlug(tenant.slug) === databaseTenant.slug,
           );
           const tenant: Tenant = {
             ...databaseTenant,
@@ -70,12 +59,11 @@ export default function MasterAdminPage() {
             adminPassword: localTenant?.adminPassword,
             mercadoPagoKey: localTenant?.mercadoPagoKey,
           };
-          saveTenant(tenant);
           return tenant;
         });
 
+        localStorage.setItem('saas_tenants', JSON.stringify(synchronized));
         setTenants(synchronized);
-        if (legacyTenants.length > 0) showToast('Lojas sincronizadas com o Supabase!');
       } catch (error) {
         if (!cancelled) {
           showToast(error instanceof Error ? error.message : 'Falha ao sincronizar as lojas.');
@@ -122,7 +110,10 @@ export default function MasterAdminPage() {
     };
     
     try {
-      const savedTenant = await saveMasterTenant(toMasterTenantInput(tenant));
+      const savedTenant = await saveMasterTenant({
+        ...toMasterTenantInput(tenant),
+        id: undefined,
+      });
       saveTenant({ ...savedTenant, adminUser: tenant.adminUser, adminPassword: tenant.adminPassword });
       setTenants(getTenants().filter((item) => item.id !== 'tenant-1'));
       setNewTenant({ name: '', slug: '', adminUser: '', adminPassword: '', paymentDay: '' });

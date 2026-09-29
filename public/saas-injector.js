@@ -85,6 +85,7 @@ function restoreOrderSteps() {
 async function initSaas() {
     const urlParams = new URLSearchParams(window.location.search);
     let tenantSlug = urlParams.get('tenant');
+    const requestedTheme = urlParams.get('theme');
 
     if (tenantSlug) {
         tenantSlug = tenantSlug.trim().toLowerCase();
@@ -112,8 +113,16 @@ async function initSaas() {
         console.warn('Não foi possível atualizar os dados públicos da loja.', error);
     }
 
-    // Os dados locais preservam credenciais e alterações ainda não sincronizadas.
-    const tenant = remoteTenant ? { ...remoteTenant, ...localTenant } : localTenant;
+    // O Supabase é a fonte principal. Localmente ficam apenas credenciais legadas.
+    const tenant = remoteTenant
+        ? {
+            ...localTenant,
+            ...remoteTenant,
+            adminUser: localTenant?.adminUser,
+            adminPassword: localTenant?.adminPassword,
+            mercadoPagoKey: localTenant?.mercadoPagoKey
+        }
+        : localTenant;
     if (!tenant) {
         if(document.body) { document.body.style.opacity = '1'; document.body.style.visibility = 'visible'; }
         return;
@@ -128,6 +137,7 @@ async function initSaas() {
 
     // O primeiro tema foi descontinuado; lojas antigas passam a usar o Tema 2.
     if (!tenant.theme || tenant.theme === 'design1') tenant.theme = 'design2';
+    if (/^design[2-9]$/.test(requestedTheme || '')) tenant.theme = requestedTheme;
 
     const isAdmin = window.location.pathname.includes('admin.html');
 
@@ -803,8 +813,8 @@ async function initSaas() {
                             console.warn('Configuração salva localmente; sincronização indisponível.', error);
                         }
 
-                        // Recarrega a página pai (Next.js) para aplicar os temas
-                        window.parent.location.reload();
+                        // Abre imediatamente o arquivo estrutural do tema escolhido.
+                        window.parent.location.href = `/${encodeURIComponent(tenantSlug)}?theme=${encodeURIComponent(storefrontConfig.theme)}`;
                     }
                 };
             }

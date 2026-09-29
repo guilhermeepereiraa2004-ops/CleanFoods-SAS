@@ -361,14 +361,14 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
                   onChange={(e) => setTenant({ ...tenant, theme: e.target.value })}
                   className="w-full bg-cf-black border border-cf-gray p-2 text-white outline-none focus:border-cf-yellow"
                 >
-                  <option value="design2">1. Suave e Arredondado (Bordas arredondadas e amigáveis)</option>
+                  <option value="design2">1. Retrô Block (Sombras sólidas deslocadas em estilo HQ/Retro)</option>
                   <option value="design3">2. Minimalista (Sem bordas e fundos limpos, focado em imagens)</option>
                   <option value="design4">3. Lista Compacta (Produtos alinhados em formato de lista)</option>
                   <option value="design5">4. Sombra Elevada (Cartões flutuando com sombras suaves)</option>
                   <option value="design6">5. Neon Cyberpunk (Brilho na cor primária nas bordas e botões)</option>
                   <option value="design7">6. Flat Moderno (Cards sem borda com fundo acinzentado sólido)</option>
                   <option value="design8">7. Tipografia Maximizada (Textos e Preços muito maiores)</option>
-                  <option value="design9">8. Retrô Block (Sombras sólidas deslocadas em estilo HQ/Retro)</option>
+                  <option value="design9">8. Suave e Arredondado (Bordas arredondadas e amigáveis)</option>
                 </select>
               </div>
 

@@ -240,24 +240,8 @@ async function listMasterTenants(
   });
 }
 
-export async function loadMasterTenants(
-  legacyTenants: MasterTenantInput[],
-): Promise<MasterTenant[]> {
+export async function loadMasterTenants(): Promise<MasterTenant[]> {
   const adminClient = await requirePlatformAdmin();
-
-  for (const legacyTenant of legacyTenants.slice(0, 100)) {
-    const payload = tenantPayload(legacyTenant);
-    const { data, error } = await adminClient
-      .from('tenants')
-      .upsert(payload, { onConflict: 'slug' })
-      .select('id')
-      .single();
-
-    if (error) throw new Error(`Não foi possível sincronizar ${payload.name}: ${error.message}`);
-    await saveBilling(adminClient, data.id, legacyTenant);
-    await saveStorefrontFooter(adminClient, data.id, legacyTenant);
-  }
-
   return listMasterTenants(adminClient);
 }
 
@@ -268,15 +252,22 @@ export async function saveMasterTenant(input: MasterTenantInput): Promise<Master
     input.id || '',
   );
 
+  const updatePayload = {
+    slug: payload.slug,
+    name: payload.name,
+    ...(input.isActive === undefined ? {} : { is_active: input.isActive }),
+  };
   const query = isUuid
-    ? adminClient.from('tenants').update(payload).eq('id', input.id as string)
+    ? adminClient.from('tenants').update(updatePayload).eq('id', input.id as string)
     : adminClient.from('tenants').upsert(payload, { onConflict: 'slug' });
   const { data, error } = await query.select(PUBLIC_TENANT_COLUMNS).single();
 
   if (error) throw new Error(`Não foi possível salvar a loja: ${error.message}`);
   const tenantId = (data as unknown as TenantRow).id;
   await saveBilling(adminClient, tenantId, input);
-  await saveStorefrontFooter(adminClient, tenantId, input);
+  if (!isUuid || input.footerCopyright !== undefined || input.footerCnpj !== undefined) {
+    await saveStorefrontFooter(adminClient, tenantId, input);
+  }
 
   const allTenants = await listMasterTenants(adminClient);
   const savedTenant = allTenants.find((tenant) => tenant.id === tenantId);
