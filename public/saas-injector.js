@@ -174,14 +174,14 @@ function initSaas() {
                     const usesLegacyDesign4Copy = currentTheme === 'design4'
                         && tenant.heroWord2 === 'Alta Gastronomia'
                         && tenant.heroWord3 === 'Fitness'
-                        && !tenant.heroWord4;
+                        && tenant.heroWord4 === undefined;
                     const heroWords = usesLegacyDesign4Copy
                         ? defaults
                         : [
-                            tenant.heroWord1 || defaults[0],
-                            tenant.heroWord2 || defaults[1],
-                            tenant.heroWord3 || defaults[2],
-                            tenant.heroWord4 || defaults[3]
+                            tenant.heroWord1 ?? defaults[0],
+                            tenant.heroWord2 ?? defaults[1],
+                            tenant.heroWord3 ?? defaults[2],
+                            tenant.heroWord4 ?? defaults[3]
                         ];
 
                     spans[0].innerText = heroWords[0];
@@ -438,19 +438,19 @@ function initSaas() {
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 1</label>
-                                        <input type="text" id="saas-hero-1" value="${(tenant.heroWord1 !== undefined && tenant.heroWord1 !== '') ? tenant.heroWord1 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[0]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-1" value="${tenant.heroWord1 ?? (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[0]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 2</label>
-                                        <input type="text" id="saas-hero-2" value="${(tenant.heroWord2 !== undefined && tenant.heroWord2 !== '') ? tenant.heroWord2 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[1]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-2" value="${tenant.heroWord2 ?? (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[1]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 3</label>
-                                        <input type="text" id="saas-hero-3" value="${(tenant.heroWord3 !== undefined && tenant.heroWord3 !== '') ? tenant.heroWord3 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[2]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-3" value="${tenant.heroWord3 ?? (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[2]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 4</label>
-                                        <input type="text" id="saas-hero-4" value="${(tenant.heroWord4 !== undefined && tenant.heroWord4 !== '') ? tenant.heroWord4 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[3]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-4" value="${tenant.heroWord4 ?? (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[3]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                 </div>
                                 <div class="mt-4">
