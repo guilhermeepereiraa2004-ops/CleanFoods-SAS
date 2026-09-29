@@ -1,21 +1,33 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { use, useState, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
 import { Tenant, getTenantBySlug, saveTenant, MasterConfig, getMasterConfig } from '@/lib/mockStorage';
+
+const subscribeToClient = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export default function TenantConfigPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const unwrappedParams = use(params);
   const { tenantSlug } = unwrappedParams;
-  const [tenant, setTenant] = useState<Tenant | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
+  const [tenant, setTenant] = useState<Tenant | null>(() => getTenantBySlug(tenantSlug));
+  const isClient = useSyncExternalStore(
+    subscribeToClient,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const [activeTab, setActiveTab] = useState<'personalizacao' | 'pagamentos'>('personalizacao');
   
   // Auth state
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => typeof window !== 'undefined' && localStorage.getItem(`tenant_auth_${tenantSlug}`) === 'true',
+  );
   const [loginUser, setLoginUser] = useState('');
   const [loginPass, setLoginPass] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [masterConfig, setMasterConfig] = useState<MasterConfig | null>(null);
+  const [masterConfig] = useState<MasterConfig>(getMasterConfig);
   
   const [toastMessage, setToastMessage] = useState('');
 
@@ -23,16 +35,6 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3000);
   };
-
-  useEffect(() => {
-    setIsClient(true);
-    setTenant(getTenantBySlug(tenantSlug));
-    setMasterConfig(getMasterConfig());
-    const authStatus = localStorage.getItem(`tenant_auth_${tenantSlug}`);
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, [tenantSlug]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,13 +47,43 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (tenant) {
       saveTenant(tenant);
+      try {
+        await fetch(`/api/tenants/${encodeURIComponent(tenant.slug)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            logoUrl: tenant.logoUrl,
+            logoSize: tenant.logoSize,
+            heroImageUrl: tenant.heroImageUrl,
+            primaryColor: tenant.primaryColor,
+            fontFamily: tenant.fontFamily,
+            bodyFontFamily: tenant.bodyFontFamily,
+            heroFontFamily: tenant.heroFontFamily,
+            theme: tenant.theme,
+            heroWord1: tenant.heroWord1,
+            heroWord2: tenant.heroWord2,
+            heroWord3: tenant.heroWord3,
+            heroWord4: tenant.heroWord4,
+            heroSubtitle: tenant.heroSubtitle,
+            heroSubtitleFont: tenant.heroSubtitleFont,
+            heroSubtitleSize: tenant.heroSubtitleSize,
+            heroFontColor: tenant.heroFontColor,
+            heroFontSize: tenant.heroFontSize,
+            heroImageSize: tenant.heroImageSize,
+            footerCopyright: tenant.footerCopyright,
+            footerCnpj: tenant.footerCnpj,
+          }),
+        });
+      } catch (error) {
+        console.warn('Configuração salva localmente; sincronização indisponível.', error);
+      }
       showToast('Configurações salvas com sucesso!');
       setTimeout(() => {
-        window.location.href = `/${tenant.slug}/admin`;
+        router.push(`/${tenant.slug}/admin`);
       }, 1000);
     }
   };
@@ -298,6 +330,29 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
                                     </div>
                                 </div>
                             </div>
+
+              <div className="bg-cf-black p-4 border border-cf-gray rounded space-y-3">
+                <h4 className="font-bold text-sm text-cf-yellow uppercase">Textos do Rodapé</h4>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Direitos reservados</label>
+                  <textarea
+                    value={tenant.footerCopyright ?? '© 2026 Cleanfoods SP. Todos os direitos reservados. Sem glúten, sem lactose.'}
+                    onChange={(e) => setTenant({ ...tenant, footerCopyright: e.target.value })}
+                    className="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-2 text-sm outline-none resize-none"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">CNPJ</label>
+                  <input
+                    type="text"
+                    value={tenant.footerCnpj ?? '66.719.007/0001-76'}
+                    onChange={(e) => setTenant({ ...tenant, footerCnpj: e.target.value })}
+                    className="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-2 text-sm outline-none"
+                    placeholder="00.000.000/0000-00"
+                  />
+                </div>
+              </div>
 
               <div>
                 <label className="block text-xs uppercase font-bold text-cf-yellow mb-2">Tema / Design Base</label>

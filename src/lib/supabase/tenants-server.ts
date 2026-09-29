@@ -26,5 +26,30 @@ export async function getPublicTenant(slug: string): Promise<PublicTenant | null
     return null;
   }
 
-  return data ? mapTenantRow(data as unknown as TenantRow) : null;
+  if (!data) return null;
+
+  const tenant = mapTenantRow(data as unknown as TenantRow);
+  const { data: footerSetting, error: footerError } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('tenant_id', tenant.id)
+    .eq('key', 'storefront_footer')
+    .eq('is_public', true)
+    .maybeSingle();
+
+  if (footerError) {
+    console.error('Falha ao carregar o rodapé público:', footerError.message);
+    return tenant;
+  }
+
+  const footer = footerSetting?.value as {
+    copyright?: unknown;
+    cnpj?: unknown;
+  } | null;
+
+  return {
+    ...tenant,
+    footerCopyright: typeof footer?.copyright === 'string' ? footer.copyright : undefined,
+    footerCnpj: typeof footer?.cnpj === 'string' ? footer.cnpj : undefined,
+  };
 }

@@ -55,6 +55,8 @@ export type PublicTenant = {
   heroSubtitleFont?: string;
   heroSubtitleSize?: string;
   logoSize?: string;
+  footerCopyright?: string;
+  footerCnpj?: string;
   createdAt: string;
 };
 

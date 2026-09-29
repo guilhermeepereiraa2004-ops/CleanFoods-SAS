@@ -96,6 +96,8 @@ export type MasterTenantInput = {
   heroSubtitleFont?: string;
   heroSubtitleSize?: string;
   logoSize?: string;
+  footerCopyright?: string;
+  footerCnpj?: string;
   paymentDay?: string;
   paymentStatus?: 'pago' | 'pendente';
 };
@@ -170,29 +172,70 @@ async function saveBilling(
   if (error) throw new Error(`Não foi possível salvar a cobrança: ${error.message}`);
 }
 
+async function saveStorefrontFooter(
+  adminClient: ReturnType<typeof createAdminClient>,
+  tenantId: string,
+  input: MasterTenantInput,
+) {
+  const { error } = await adminClient.from('settings').upsert(
+    {
+      tenant_id: tenantId,
+      key: 'storefront_footer',
+      value: {
+        copyright: input.footerCopyright
+          ?? '© 2026 Cleanfoods SP. Todos os direitos reservados. Sem glúten, sem lactose.',
+        cnpj: input.footerCnpj ?? '66.719.007/0001-76',
+      },
+      is_public: true,
+    },
+    { onConflict: 'tenant_id,key' },
+  );
+
+  if (error) throw new Error(`Não foi possível salvar o rodapé: ${error.message}`);
+}
+
 async function listMasterTenants(
   adminClient: ReturnType<typeof createAdminClient>,
 ): Promise<MasterTenant[]> {
-  const [{ data: tenantRows, error: tenantsError }, { data: billingRows, error: billingError }] =
+  const [
+    { data: tenantRows, error: tenantsError },
+    { data: billingRows, error: billingError },
+    { data: footerRows, error: footerError },
+  ] =
     await Promise.all([
       adminClient.from('tenants').select(PUBLIC_TENANT_COLUMNS).order('created_at'),
       adminClient.from('tenant_billing').select('tenant_id,payment_day,payment_status'),
+      adminClient
+        .from('settings')
+        .select('tenant_id,value')
+        .eq('key', 'storefront_footer')
+        .eq('is_public', true),
     ]);
 
   if (tenantsError) throw new Error(`Não foi possível carregar as lojas: ${tenantsError.message}`);
   if (billingError) throw new Error(`Não foi possível carregar as cobranças: ${billingError.message}`);
+  if (footerError) throw new Error(`Não foi possível carregar os rodapés: ${footerError.message}`);
 
   const billingByTenant = new Map(
     (billingRows || []).map((billing) => [billing.tenant_id, billing]),
+  );
+  const footerByTenant = new Map(
+    (footerRows || []).map((setting) => [setting.tenant_id, setting.value]),
   );
 
   return (tenantRows || []).map((row) => {
     const tenant = mapTenantRow(row as unknown as TenantRow);
     const billing = billingByTenant.get(tenant.id);
+    const footer = footerByTenant.get(tenant.id) as {
+      copyright?: unknown;
+      cnpj?: unknown;
+    } | undefined;
     return {
       ...tenant,
       paymentDay: billing?.payment_day?.toString(),
       paymentStatus: billing?.payment_status === 'paid' ? 'pago' : 'pendente',
+      footerCopyright: typeof footer?.copyright === 'string' ? footer.copyright : undefined,
+      footerCnpj: typeof footer?.cnpj === 'string' ? footer.cnpj : undefined,
     };
   });
 }
@@ -212,6 +255,7 @@ export async function loadMasterTenants(
 
     if (error) throw new Error(`Não foi possível sincronizar ${payload.name}: ${error.message}`);
     await saveBilling(adminClient, data.id, legacyTenant);
+    await saveStorefrontFooter(adminClient, data.id, legacyTenant);
   }
 
   return listMasterTenants(adminClient);
@@ -232,6 +276,7 @@ export async function saveMasterTenant(input: MasterTenantInput): Promise<Master
   if (error) throw new Error(`Não foi possível salvar a loja: ${error.message}`);
   const tenantId = (data as unknown as TenantRow).id;
   await saveBilling(adminClient, tenantId, input);
+  await saveStorefrontFooter(adminClient, tenantId, input);
 
   const allTenants = await listMasterTenants(adminClient);
   const savedTenant = allTenants.find((tenant) => tenant.id === tenantId);

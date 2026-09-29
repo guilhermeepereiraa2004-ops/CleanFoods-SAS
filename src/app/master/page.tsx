@@ -25,7 +25,9 @@ function toMasterTenantInput(tenant: Tenant): MasterTenantInput {
     heroFontColor: tenant.heroFontColor, heroFontSize: tenant.heroFontSize,
     heroImageSize: tenant.heroImageSize, heroSubtitle: tenant.heroSubtitle,
     heroSubtitleFont: tenant.heroSubtitleFont, heroSubtitleSize: tenant.heroSubtitleSize,
-    logoSize: tenant.logoSize, paymentDay: tenant.paymentDay, paymentStatus: tenant.paymentStatus,
+    logoSize: tenant.logoSize, footerCopyright: tenant.footerCopyright,
+    footerCnpj: tenant.footerCnpj, paymentDay: tenant.paymentDay,
+    paymentStatus: tenant.paymentStatus,
   };
 }
 

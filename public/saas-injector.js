@@ -1,6 +1,87 @@
 // saas-injector.js
 // Injetado nos arquivos HTML originais para habilitar o modo Multi-tenant (Fontes, Cores, Temas)
 
+const DEFAULT_FOOTER_COPYRIGHT = '© 2026 Cleanfoods SP. Todos os direitos reservados. Sem glúten, sem lactose.';
+const DEFAULT_FOOTER_CNPJ = '66.719.007/0001-76';
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
+function restoreStorefrontFooter(tenant) {
+    const footer = document.querySelector('footer');
+    if (!footer) return;
+
+    const visibilityFix = document.createElement('style');
+    visibilityFix.id = 'saas-footer-visibility-fix';
+    visibilityFix.textContent = `
+        footer .reveal-up, footer .reveal-right {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+    `;
+    document.head.appendChild(visibilityFix);
+
+    const legalBlock = [...footer.querySelectorAll('div')].find((element) =>
+        /todos os direitos reservados/i.test(element.textContent || '')
+        && [...element.children].some((child) => child.tagName === 'DIV')
+    );
+    if (!legalBlock) return;
+
+    const attribution = [...legalBlock.children].find((child) => child.tagName === 'DIV');
+    const copyright = document.createElement('span');
+    copyright.id = 'saas-footer-copyright';
+    copyright.textContent = tenant.footerCopyright ?? DEFAULT_FOOTER_COPYRIGHT;
+    const cnpj = document.createElement('span');
+    cnpj.id = 'saas-footer-cnpj';
+    cnpj.textContent = `CNPJ: ${tenant.footerCnpj ?? DEFAULT_FOOTER_CNPJ}`;
+
+    legalBlock.replaceChildren(copyright, document.createElement('br'), cnpj);
+    if (attribution) legalBlock.appendChild(attribution);
+}
+
+function restoreOrderSteps() {
+    const footer = document.querySelector('footer');
+    if (!footer || document.getElementById('saas-order-steps')) return;
+
+    const section = document.createElement('section');
+    section.id = 'saas-order-steps';
+    section.innerHTML = `
+        <div class="saas-steps-inner">
+            <p class="saas-steps-kicker">É simples pedir</p>
+            <h2>Seu pedido em 3 etapas</h2>
+            <div class="saas-steps-grid">
+                <article><strong>1</strong><h3>Escolha seus pratos</h3><p>Veja o cardápio e adicione suas refeições favoritas.</p></article>
+                <article><strong>2</strong><h3>Finalize o pedido</h3><p>Informe seus dados, escolha a entrega e confirme o pagamento.</p></article>
+                <article><strong>3</strong><h3>Receba e aproveite</h3><p>Agora é só aguardar suas refeições prontas para a semana.</p></article>
+            </div>
+        </div>
+    `;
+
+    const style = document.createElement('style');
+    style.id = 'saas-order-steps-style';
+    style.textContent = `
+        #saas-order-steps { padding: 72px 20px; background: #151515; border-top: 1px solid #333; color: #fff; }
+        .saas-steps-inner { width: min(1120px, 100%); margin: 0 auto; text-align: center; }
+        .saas-steps-kicker { margin: 0 0 8px; color: var(--cf-yellow, #F6C500); font-weight: 800; text-transform: uppercase; letter-spacing: .16em; }
+        #saas-order-steps h2 { margin: 0 0 36px; font-size: clamp(2rem, 5vw, 4rem); line-height: 1; text-transform: uppercase; }
+        .saas-steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .saas-steps-grid article { padding: 28px 22px; background: #0e0e0e; border: 1px solid #333; border-bottom: 4px solid var(--cf-yellow, #F6C500); }
+        .saas-steps-grid strong { display: inline-grid; place-items: center; width: 54px; height: 54px; margin-bottom: 18px; border-radius: 50%; background: var(--cf-yellow, #F6C500); color: #0e0e0e; font-size: 1.65rem; }
+        .saas-steps-grid h3 { margin: 0 0 10px; color: #fff; font-size: 1.2rem; text-transform: uppercase; }
+        .saas-steps-grid p { margin: 0; color: #aaa; line-height: 1.55; }
+        @media (max-width: 760px) { .saas-steps-grid { grid-template-columns: 1fr; } }
+    `;
+    document.head.appendChild(style);
+    footer.before(section);
+}
+
 async function initSaas() {
     const urlParams = new URLSearchParams(window.location.search);
     let tenantSlug = urlParams.get('tenant');
@@ -186,6 +267,9 @@ async function initSaas() {
         const pathName = window.location.pathname;
         const isIndexPage = pathName.includes('index') || pathName === '/' || pathName === '' || pathName.endsWith('/');
         if (isIndexPage) {
+            restoreOrderSteps();
+            restoreStorefrontFooter(tenant);
+
             const heroTitle = document.getElementById('hero-title');
             if (heroTitle) {
                 const spans = heroTitle.querySelectorAll('span');
@@ -514,6 +598,18 @@ async function initSaas() {
                                 </div>
                             </div>
 
+                            <div class="bg-cf-black p-4 border border-cf-gray rounded space-y-3 mt-4">
+                                <h4 class="font-bold text-sm text-cf-yellow uppercase mb-2">Textos do Rodapé</h4>
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">Direitos reservados</label>
+                                    <textarea id="saas-footer-copyright-input" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-2 text-sm outline-none resize-none" rows="2">${escapeHtml(tenant.footerCopyright ?? DEFAULT_FOOTER_COPYRIGHT)}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">CNPJ</label>
+                                    <input type="text" id="saas-footer-cnpj-input" value="${escapeHtml(tenant.footerCnpj ?? DEFAULT_FOOTER_CNPJ)}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-2 text-sm outline-none" placeholder="00.000.000/0000-00">
+                                </div>
+                            </div>
+
                             <div class="flex gap-4 mt-4">
                                 <div class="flex-1">
                                     <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Cor Primária (Destaque)</label>
@@ -665,13 +761,11 @@ async function initSaas() {
                     const tenantsList = JSON.parse(localStorage.getItem('saas_tenants') || '[]');
                     const tenantIdx = tenantsList.findIndex(t => t.slug === tenantSlug);
                     if (tenantIdx >= 0) {
-                        tenantsList[tenantIdx] = {
-                            ...tenantsList[tenantIdx],
+                        const storefrontConfig = {
                             logoUrl: currentLogoBase64,
                             logoSize: document.getElementById('saas-logo-size').value,
                             heroImageUrl: currentHeroBase64,
                             primaryColor: document.getElementById('saas-color').value,
-                            mercadoPagoKey: document.getElementById('saas-mp-key').value,
                             fontFamily: document.getElementById('saas-font').value,
                             bodyFontFamily: document.getElementById('saas-body-font').value,
                             heroFontFamily: document.getElementById('saas-hero-font').value,
@@ -685,9 +779,29 @@ async function initSaas() {
                             heroSubtitleSize: document.getElementById('saas-hero-subtitle-size').value,
                             heroFontColor: document.getElementById('saas-hero-color').value,
                             heroFontSize: document.getElementById('saas-hero-size').value,
-                            heroImageSize: document.getElementById('saas-hero-image-size').value
+                            heroImageSize: document.getElementById('saas-hero-image-size').value,
+                            footerCopyright: document.getElementById('saas-footer-copyright-input').value,
+                            footerCnpj: document.getElementById('saas-footer-cnpj-input').value
+                        };
+                        tenantsList[tenantIdx] = {
+                            ...tenantsList[tenantIdx],
+                            ...storefrontConfig,
+                            mercadoPagoKey: document.getElementById('saas-mp-key').value
                         };
                         localStorage.setItem('saas_tenants', JSON.stringify(tenantsList));
+
+                        try {
+                            const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(storefrontConfig)
+                            });
+                            if (!response.ok && response.status !== 401 && response.status !== 403) {
+                                console.warn('Não foi possível sincronizar a configuração com o Supabase.');
+                            }
+                        } catch (error) {
+                            console.warn('Configuração salva localmente; sincronização indisponível.', error);
+                        }
 
                         // Recarrega a página pai (Next.js) para aplicar os temas
                         window.parent.location.reload();

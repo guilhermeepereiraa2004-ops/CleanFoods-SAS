@@ -28,6 +28,8 @@ export interface Tenant {
   heroSubtitleFont?: string;
   heroSubtitleSize?: string;
   logoSize?: string;
+  footerCopyright?: string;
+  footerCnpj?: string;
   
   // Acesso e Cobrança
   adminUser?: string;
