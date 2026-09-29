@@ -162,8 +162,8 @@
 </head>
 
 <body class="antialiased relative min-h-screen flex">
-    <!-- Login Overlay Bypassed -->
-    <div id="login-overlay" style="display: none !important;" class="fixed inset-0 bg-cf-black z-[100] flex items-center justify-center overflow-hidden">
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="fixed inset-0 bg-cf-black z-[100] flex items-center justify-center overflow-hidden">
         <!-- Animated Background Elements -->
         <div class="absolute inset-0 bg-pattern opacity-50"></div>
         <div class="absolute top-1/4 left-0 w-[150%] overflow-hidden -rotate-3 opacity-5 pointer-events-none flex whitespace-nowrap">
@@ -1401,9 +1401,9 @@
     </div>
 
     <!-- Supabase SDK & Central Config -->
-    <script src="mock-supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
     <script src="saas-injector.js"></script>
-    <script src="config.js"></script>
+    <script src="/api/supabase-config"></script>
 
     <script>
         // Initialize Supabase Client
@@ -1412,9 +1412,9 @@
             window.SUPABASE_ANON_KEY && window.SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY") {
             try {
                 const { createClient } = supabase;
-                const adminKey = localStorage.getItem('cleanfoods_admin_key');
-                const keyToUse = adminKey || window.SUPABASE_ANON_KEY;
-                supabaseClient = createClient(window.SUPABASE_URL, keyToUse);
+                localStorage.removeItem('cleanfoods_admin_key');
+                supabaseClient = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+                window.cleanFoodsSupabaseClient = supabaseClient;
             } catch (err) {
                 console.error("Erro ao inicializar Supabase:", err);
             }
@@ -4122,22 +4122,40 @@
         }
 
         // Login Logic
+        async function canManageActiveTenant(accessToken) {
+            const tenantSlug = sessionStorage.getItem('active_tenant');
+            if (!tenantSlug) return false;
+
+            const headers = accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {};
+            const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}/access`, {
+                headers,
+                cache: 'no-store'
+            });
+            return response.ok;
+        }
+
+        function showAdminLoginError(message) {
+            const errorBox = document.getElementById('login-error');
+            errorBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ${message}`;
+            errorBox.classList.remove('hidden');
+        }
+
         // Check for existing Supabase Auth session on page load
         document.addEventListener("DOMContentLoaded", async () => {
             if (supabaseClient) {
                 try {
                     const { data: { session } } = await supabaseClient.auth.getSession();
-                    if (session) {
+                    if (await canManageActiveTenant(session?.access_token)) {
                         document.getElementById('login-overlay').style.display = 'none';
+                    } else if (session) {
+                        await supabaseClient.auth.signOut();
+                        showAdminLoginError('Este usuário não possui acesso a esta loja.');
                     }
                 } catch (err) {
                     console.error("Erro ao verificar sessão:", err);
                 }
             } else {
-                // Fallback: no Supabase, use sessionStorage (less secure)
-                if (sessionStorage.getItem('cleanfoods_admin_logged') === 'true') {
-                    document.getElementById('login-overlay').style.display = 'none';
-                }
+                showAdminLoginError('Autenticação indisponível. Tente novamente em instantes.');
             }
         });
 
@@ -4162,15 +4180,20 @@
                         throw authError;
                     }
 
+                    if (!data.session?.access_token || !await canManageActiveTenant(data.session.access_token)) {
+                        await supabaseClient.auth.signOut();
+                        throw new Error('Este usuário não possui acesso a esta loja.');
+                    }
+
                     document.getElementById('login-overlay').style.display = 'none';
                     err.classList.add('hidden');
                 } catch (authErr) {
                     console.error("Erro de autenticação:", authErr);
-                    err.classList.remove('hidden');
+                    showAdminLoginError(authErr?.message || 'Credenciais inválidas!');
                 }
             } else {
                 // Fallback if Supabase is not configured
-                err.classList.remove('hidden');
+                showAdminLoginError('Autenticação indisponível.');
             }
             
             submitBtn.innerHTML = originalBtnText;
@@ -4546,7 +4569,6 @@
             }
         }
     </script>
-    <script src="saas-injector.js"></script>
 </body>
 
 </html>

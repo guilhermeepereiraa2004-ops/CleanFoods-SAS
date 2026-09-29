@@ -13,6 +13,60 @@ function escapeHtml(value) {
         .replaceAll("'", '&#039;');
 }
 
+function optimizeStorefrontImage(file, maxWidth, maxHeight) {
+    const maxDataUrlLength = 800000;
+
+    return new Promise((resolve, reject) => {
+        if (!file?.type?.startsWith('image/')) {
+            reject(new Error('Selecione um arquivo de imagem válido.'));
+            return;
+        }
+
+        const image = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        image.onload = () => {
+            try {
+                let scale = Math.min(1, maxWidth / image.naturalWidth, maxHeight / image.naturalHeight);
+                let width = Math.max(1, Math.round(image.naturalWidth * scale));
+                let height = Math.max(1, Math.round(image.naturalHeight * scale));
+                let result = '';
+
+                for (let resizeAttempt = 0; resizeAttempt < 4; resizeAttempt += 1) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const context = canvas.getContext('2d');
+                    if (!context) throw new Error('Não foi possível processar a imagem.');
+                    context.drawImage(image, 0, 0, width, height);
+
+                    for (let quality = 0.9; quality >= 0.5; quality -= 0.1) {
+                        result = canvas.toDataURL('image/webp', quality);
+                        if (result.length <= maxDataUrlLength) break;
+                    }
+                    if (result.length <= maxDataUrlLength) break;
+
+                    width = Math.max(1, Math.round(width * 0.8));
+                    height = Math.max(1, Math.round(height * 0.8));
+                }
+
+                if (!result || result.length > maxDataUrlLength) {
+                    throw new Error('A imagem é muito grande. Escolha outra imagem.');
+                }
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            } finally {
+                URL.revokeObjectURL(objectUrl);
+            }
+        };
+        image.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error('Não foi possível abrir essa imagem.'));
+        };
+        image.src = objectUrl;
+    });
+}
+
 function restoreStorefrontFooter(tenant) {
     const footer = document.querySelector('footer');
     if (!footer) return;
@@ -726,29 +780,31 @@ async function initSaas() {
                 let currentLogoBase64 = tenant.logoUrl || '';
                 let currentHeroBase64 = tenant.heroImageUrl || '';
 
-                document.getElementById('saas-logo-file').addEventListener('change', (e) => {
+                document.getElementById('saas-logo-file').addEventListener('change', async (e) => {
                     const file = e.target.files[0];
                     if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            currentLogoBase64 = reader.result;
+                        try {
+                            currentLogoBase64 = await optimizeStorefrontImage(file, 1000, 1000);
                             document.getElementById('saas-logo-preview').src = currentLogoBase64;
                             document.getElementById('saas-logo-preview-container').classList.remove('hidden');
-                        };
-                        reader.readAsDataURL(file);
+                        } catch (error) {
+                            window.alert(error instanceof Error ? error.message : 'Não foi possível processar a logo.');
+                            e.target.value = '';
+                        }
                     }
                 });
 
-                document.getElementById('saas-hero-file').addEventListener('change', (e) => {
+                document.getElementById('saas-hero-file').addEventListener('change', async (e) => {
                     const file = e.target.files[0];
                     if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            currentHeroBase64 = reader.result;
+                        try {
+                            currentHeroBase64 = await optimizeStorefrontImage(file, 1920, 1440);
                             document.getElementById('saas-hero-preview').src = currentHeroBase64;
                             document.getElementById('saas-hero-preview-container').classList.remove('hidden');
-                        };
-                        reader.readAsDataURL(file);
+                        } catch (error) {
+                            window.alert(error instanceof Error ? error.message : 'Não foi possível processar a imagem.');
+                            e.target.value = '';
+                        }
                     }
                 });
 
@@ -765,55 +821,72 @@ async function initSaas() {
                 // Sobrescreve o botão Salvar para também salvar dados SaaS
                 const originalSaveConfig = window.saveConfig;
                 window.saveConfig = async () => {
-                    if (originalSaveConfig) await originalSaveConfig();
-
                     const tenantsList = JSON.parse(localStorage.getItem('saas_tenants') || '[]');
                     const tenantIdx = tenantsList.findIndex(t => t.slug === tenantSlug);
-                    if (tenantIdx >= 0) {
-                        const storefrontConfig = {
-                            logoUrl: currentLogoBase64,
-                            logoSize: document.getElementById('saas-logo-size').value,
-                            heroImageUrl: currentHeroBase64,
-                            primaryColor: document.getElementById('saas-color').value,
-                            fontFamily: document.getElementById('saas-font').value,
-                            bodyFontFamily: document.getElementById('saas-body-font').value,
-                            heroFontFamily: document.getElementById('saas-hero-font').value,
-                            theme: document.getElementById('saas-theme').value,
-                            heroWord1: document.getElementById('saas-hero-1').value,
-                            heroWord2: document.getElementById('saas-hero-2').value,
-                            heroWord3: document.getElementById('saas-hero-3').value,
-                            heroWord4: document.getElementById('saas-hero-4').value,
-                            heroSubtitle: document.getElementById('saas-hero-subtitle').value,
-                            heroSubtitleFont: document.getElementById('saas-hero-subtitle-font').value,
-                            heroSubtitleSize: document.getElementById('saas-hero-subtitle-size').value,
-                            heroFontColor: document.getElementById('saas-hero-color').value,
-                            heroFontSize: document.getElementById('saas-hero-size').value,
-                            heroImageSize: document.getElementById('saas-hero-image-size').value,
-                            footerCopyright: document.getElementById('saas-footer-copyright-input').value,
-                            footerCnpj: document.getElementById('saas-footer-cnpj-input').value
-                        };
-                        tenantsList[tenantIdx] = {
-                            ...tenantsList[tenantIdx],
-                            ...storefrontConfig,
-                            mercadoPagoKey: document.getElementById('saas-mp-key').value
-                        };
-                        localStorage.setItem('saas_tenants', JSON.stringify(tenantsList));
+                    const storefrontConfig = {
+                        logoUrl: currentLogoBase64,
+                        logoSize: document.getElementById('saas-logo-size').value,
+                        heroImageUrl: currentHeroBase64,
+                        primaryColor: document.getElementById('saas-color').value,
+                        fontFamily: document.getElementById('saas-font').value,
+                        bodyFontFamily: document.getElementById('saas-body-font').value,
+                        heroFontFamily: document.getElementById('saas-hero-font').value,
+                        theme: document.getElementById('saas-theme').value,
+                        heroWord1: document.getElementById('saas-hero-1').value,
+                        heroWord2: document.getElementById('saas-hero-2').value,
+                        heroWord3: document.getElementById('saas-hero-3').value,
+                        heroWord4: document.getElementById('saas-hero-4').value,
+                        heroSubtitle: document.getElementById('saas-hero-subtitle').value,
+                        heroSubtitleFont: document.getElementById('saas-hero-subtitle-font').value,
+                        heroSubtitleSize: document.getElementById('saas-hero-subtitle-size').value,
+                        heroFontColor: document.getElementById('saas-hero-color').value,
+                        heroFontSize: document.getElementById('saas-hero-size').value,
+                        heroImageSize: document.getElementById('saas-hero-image-size').value,
+                        footerCopyright: document.getElementById('saas-footer-copyright-input').value,
+                        footerCnpj: document.getElementById('saas-footer-cnpj-input').value
+                    };
 
-                        try {
-                            const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`, {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(storefrontConfig)
-                            });
-                            if (!response.ok && response.status !== 401 && response.status !== 403) {
-                                console.warn('Não foi possível sincronizar a configuração com o Supabase.');
-                            }
-                        } catch (error) {
-                            console.warn('Configuração salva localmente; sincronização indisponível.', error);
+                    try {
+                        const authClient = window.cleanFoodsSupabaseClient;
+                        const { data: { session }, error: sessionError } = authClient
+                            ? await authClient.auth.getSession()
+                            : { data: { session: null }, error: null };
+                        if (sessionError) throw sessionError;
+
+                        const headers = { 'Content-Type': 'application/json' };
+                        if (session?.access_token) {
+                            headers.Authorization = `Bearer ${session.access_token}`;
                         }
 
-                        // Abre imediatamente o arquivo estrutural do tema escolhido.
+                        const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`, {
+                            method: 'PATCH',
+                            headers,
+                            body: JSON.stringify(storefrontConfig)
+                        });
+                        const result = await response.json().catch(() => null);
+                        if (!response.ok || !result?.ok) {
+                            throw new Error(result?.error || `Falha ao salvar no banco (${response.status}).`);
+                        }
+
+                        if (originalSaveConfig) await originalSaveConfig();
+                        if (tenantIdx >= 0) {
+                            tenantsList[tenantIdx] = {
+                                ...tenantsList[tenantIdx],
+                                ...storefrontConfig,
+                                mercadoPagoKey: document.getElementById('saas-mp-key').value
+                            };
+                            localStorage.setItem('saas_tenants', JSON.stringify(tenantsList));
+                        }
+                        if (typeof window.showToast === 'function') {
+                            window.showToast('CONFIGURAÇÕES SINCRONIZADAS COM SUCESSO!');
+                        }
+
+                        // Abre imediatamente o arquivo estrutural do tema confirmado no banco.
                         window.parent.location.href = `/${encodeURIComponent(tenantSlug)}?theme=${encodeURIComponent(storefrontConfig.theme)}`;
+                    } catch (error) {
+                        const message = error instanceof Error ? error.message : 'Não foi possível salvar as configurações.';
+                        console.error('Falha ao sincronizar a configuração com o Supabase.', error);
+                        window.alert(`NÃO FOI POSSÍVEL SALVAR\n\n${message}`);
                     }
                 };
             }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
+import { authorizeTenantRequest } from '@/lib/supabase/tenant-access';
 import { getPublicTenant } from '@/lib/supabase/tenants-server';
 import { normalizeTenantSlug } from '@/lib/tenants';
 
@@ -51,19 +51,15 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ tenantSlug: string }> },
 ) {
-  const sessionClient = await createClient();
-  const { data: claimsData } = await sessionClient.auth.getClaims();
-  const userId = claimsData?.claims?.sub;
+  const { tenantSlug } = await params;
+  const slug = normalizeTenantSlug(tenantSlug);
+  const access = await authorizeTenantRequest(request, slug);
+  if (!access.ok) {
+    console.warn('[tenant-config] rejected save', { slug, status: access.status });
+    return NextResponse.json({ error: access.error }, { status: access.status });
+  }
 
-  if (!userId) return NextResponse.json({ error: 'Sessão expirada.' }, { status: 401 });
-
-  const { data: platformAdmin } = await sessionClient
-    .from('platform_admins')
-    .select('user_id')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (!platformAdmin) return NextResponse.json({ error: 'Acesso não autorizado.' }, { status: 403 });
+  const adminClient = createAdminClient();
 
   let input: StorefrontConfiguration;
   try {
@@ -72,12 +68,9 @@ export async function PATCH(
     return NextResponse.json({ error: 'Configuração inválida.' }, { status: 400 });
   }
 
-  const { tenantSlug } = await params;
-  const slug = normalizeTenantSlug(tenantSlug);
   const theme = typeof input.theme === 'string' && /^design[2-9]$/.test(input.theme)
     ? input.theme
     : 'design2';
-  const adminClient = createAdminClient();
   const { data: tenant, error: tenantError } = await adminClient
     .from('tenants')
     .update({
@@ -100,7 +93,7 @@ export async function PATCH(
       hero_subtitle_size: optionalText(input.heroSubtitleSize),
       logo_size: optionalText(input.logoSize),
     })
-    .eq('slug', slug)
+    .eq('id', access.tenantId)
     .select('id')
     .single();
 
@@ -126,6 +119,13 @@ export async function PATCH(
     console.error('Falha ao salvar rodapé da vitrine:', footerError.message);
     return NextResponse.json({ error: 'Não foi possível salvar o rodapé.' }, { status: 500 });
   }
+
+  console.info('[tenant-config] storefront configuration saved', {
+    slug,
+    authorization: access.authorization,
+    hasLogo: Boolean(optionalText(input.logoUrl)),
+    hasHeroImage: Boolean(optionalText(input.heroImageUrl)),
+  });
 
   return NextResponse.json({ ok: true });
 }
