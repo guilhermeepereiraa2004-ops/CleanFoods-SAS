@@ -1,13 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { Tenant, getTenants, saveTenant, deleteTenant, MasterConfig, getMasterConfig, saveMasterConfig } from '@/lib/mockStorage';
+import { logoutMaster } from './actions';
+
+const subscribeToClient = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export default function MasterAdminPage() {
-  const [tenants, setTenants] = useState<Tenant[]>([]);
-  const [masterConfig, setMasterConfig] = useState<MasterConfig>({ pixKey: '', pixName: '' });
-  const [isClient, setIsClient] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [tenants, setTenants] = useState<Tenant[]>(getTenants);
+  const [masterConfig, setMasterConfig] = useState<MasterConfig>(getMasterConfig);
+  const isClient = useSyncExternalStore(
+    subscribeToClient,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const [activeModule, setActiveModule] = useState<'franquias' | 'nova' | 'cobranca' | 'config'>('franquias');
   const [toastMessage, setToastMessage] = useState('');
 
@@ -15,11 +23,6 @@ export default function MasterAdminPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3000);
   };
-
-  // Login states
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
 
   // Form states
   const [newTenant, setNewTenant] = useState({ 
@@ -34,34 +37,8 @@ export default function MasterAdminPage() {
 
   // Delete states
   const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
-  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [deleteError, setDeleteError] = useState('');
-
-  useEffect(() => {
-    setIsClient(true);
-    setTenants(getTenants());
-    setMasterConfig(getMasterConfig());
-    const authStatus = localStorage.getItem('master_auth');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email === 'guilhermee.pereiraa2004@gmail.com' && password === 'naoseinao') {
-      setIsAuthenticated(true);
-      localStorage.setItem('master_auth', 'true');
-      setLoginError('');
-    } else {
-      setLoginError('Credenciais inválidas!');
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('master_auth');
-  };
 
   const handleCreateTenant = (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,15 +109,15 @@ export default function MasterAdminPage() {
 
   const handleDeleteTenant = (e: React.FormEvent) => {
     e.preventDefault();
-    if (deletePassword === 'naoseinao' && tenantToDelete) {
+    if (tenantToDelete && deleteConfirmation === tenantToDelete.slug) {
       deleteTenant(tenantToDelete.id);
       setTenants(getTenants());
       setTenantToDelete(null);
-      setDeletePassword('');
+      setDeleteConfirmation('');
       setDeleteError('');
       showToast('Franquia deletada com sucesso!');
     } else {
-      setDeleteError('Senha incorreta!');
+      setDeleteError('Digite o slug exato da loja para confirmar.');
     }
   };
 
@@ -151,38 +128,6 @@ export default function MasterAdminPage() {
   };
 
   if (!isClient) return null;
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-cf-black flex items-center justify-center p-4">
-        <div className="bg-cf-darkgray border-2 border-cf-yellow p-8 w-full max-w-md torn-edge">
-          <h1 className="font-impact text-3xl text-cf-yellow text-center mb-6 uppercase tracking-widest">Master Admin</h1>
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-xs uppercase font-bold text-gray-400 mb-1">E-mail</label>
-              <input 
-                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-cf-black border border-cf-gray p-3 text-white outline-none focus:border-cf-yellow" 
-                placeholder="Seu e-mail..."
-              />
-            </div>
-            <div>
-              <label className="block text-xs uppercase font-bold text-gray-400 mb-1">Senha</label>
-              <input 
-                type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-cf-black border border-cf-gray p-3 text-white outline-none focus:border-cf-yellow" 
-                placeholder="********"
-              />
-            </div>
-            {loginError && <p className="text-red-500 text-sm font-bold">{loginError}</p>}
-            <button type="submit" className="w-full bg-cf-yellow text-cf-black font-bold uppercase py-3 mt-4 hover:bg-white transition-colors">
-              Entrar
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-cf-black text-white flex relative">
@@ -203,13 +148,15 @@ export default function MasterAdminPage() {
             </p>
             <form onSubmit={handleDeleteTenant} className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs uppercase font-bold text-gray-400 mb-1">Senha de Confirmação</label>
+                <label className="block text-xs uppercase font-bold text-gray-400 mb-1">
+                  Digite {tenantToDelete.slug} para confirmar
+                </label>
                 <input 
-                  type="password" 
-                  value={deletePassword} 
-                  onChange={(e) => setDeletePassword(e.target.value)}
+                  type="text"
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
                   className="w-full bg-cf-black border border-cf-gray p-3 text-white outline-none focus:border-red-500" 
-                  placeholder="********"
+                  placeholder={tenantToDelete.slug}
                 />
               </div>
               {deleteError && <p className="text-red-500 text-sm font-bold">{deleteError}</p>}
@@ -217,7 +164,7 @@ export default function MasterAdminPage() {
                 <button type="submit" className="flex-1 bg-red-600 text-white font-bold uppercase py-3 hover:bg-red-500">
                   Apagar Loja
                 </button>
-                <button type="button" onClick={() => { setTenantToDelete(null); setDeletePassword(''); setDeleteError(''); }} className="flex-1 bg-gray-600 text-white font-bold uppercase py-3 hover:bg-gray-500">
+                <button type="button" onClick={() => { setTenantToDelete(null); setDeleteConfirmation(''); setDeleteError(''); }} className="flex-1 bg-gray-600 text-white font-bold uppercase py-3 hover:bg-gray-500">
                   Cancelar
                 </button>
               </div>
@@ -259,9 +206,11 @@ export default function MasterAdminPage() {
           </button>
         </nav>
         <div className="p-4 border-t border-cf-gray">
-          <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-900/30 uppercase font-bold">
-            <i className="fa-solid fa-right-from-bracket mr-2"></i> Sair
-          </button>
+          <form action={logoutMaster}>
+            <button type="submit" className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-900/30 uppercase font-bold">
+              <i className="fa-solid fa-right-from-bracket mr-2"></i> Sair
+            </button>
+          </form>
         </div>
       </div>
 
