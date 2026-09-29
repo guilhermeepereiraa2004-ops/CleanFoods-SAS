@@ -74,10 +74,28 @@ function restoreStorefrontFooter(tenant) {
     const visibilityFix = document.createElement('style');
     visibilityFix.id = 'saas-footer-visibility-fix';
     visibilityFix.textContent = `
+        footer {
+            position: relative !important;
+            display: block !important;
+            min-height: 500px;
+            background-color: #0e0e0e !important;
+            overflow: hidden;
+        }
         footer .reveal-up, footer .reveal-right {
             opacity: 1 !important;
             visibility: visible !important;
             transform: none !important;
+        }
+        footer h2, footer .font-impact, footer .btn-street {
+            font-family: 'Anton', Impact, sans-serif !important;
+        }
+        footer .text-white { color: #fff !important; }
+        footer .text-cf-yellow { color: var(--cf-yellow, #F6C500) !important; }
+        footer .font-street {
+            font-family: 'Permanent Marker', cursive !important;
+        }
+        @media (max-width: 767px) {
+            footer { min-height: 0; }
         }
     `;
     document.head.appendChild(visibilityFix);
@@ -106,14 +124,27 @@ function restoreOrderSteps() {
 
     const section = document.createElement('section');
     section.id = 'saas-order-steps';
+    section.setAttribute('aria-labelledby', 'saas-order-steps-title');
     section.innerHTML = `
         <div class="saas-steps-inner">
-            <p class="saas-steps-kicker">É simples pedir</p>
-            <h2>Seu pedido em 3 etapas</h2>
+            <h2 id="saas-order-steps-title"><span>Como</span> <em>funciona</em></h2>
+            <div class="saas-steps-track" aria-hidden="true"></div>
             <div class="saas-steps-grid">
-                <article><strong>1</strong><h3>Escolha seus pratos</h3><p>Veja o cardápio e adicione suas refeições favoritas.</p></article>
-                <article><strong>2</strong><h3>Finalize o pedido</h3><p>Informe seus dados, escolha a entrega e confirme o pagamento.</p></article>
-                <article><strong>3</strong><h3>Receba e aproveite</h3><p>Agora é só aguardar suas refeições prontas para a semana.</p></article>
+                <article>
+                    <div class="saas-step-icon saas-step-icon-yellow rounded-full"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                    <h3>A escolha</h3>
+                    <p>Monte seu arsenal. Escolha entre frango, patinho ou linha gourmet direto pelo site.</p>
+                </article>
+                <article>
+                    <div class="saas-step-icon saas-step-icon-white rounded-full"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <h3>O pedido</h3>
+                    <p>Atendimento direto, sem enrola&ccedil;&atilde;o. Mandou mensagem, fechou o kit.</p>
+                </article>
+                <article>
+                    <div class="saas-step-icon saas-step-icon-square"><i class="fa-solid fa-box-open"></i></div>
+                    <h3>O recebimento</h3>
+                    <p>Chega congelado, pronto pra aquecer. S&oacute; focar no treino, a dieta t&aacute; garantida.</p>
+                </article>
             </div>
         </div>
     `;
@@ -121,16 +152,123 @@ function restoreOrderSteps() {
     const style = document.createElement('style');
     style.id = 'saas-order-steps-style';
     style.textContent = `
-        #saas-order-steps { padding: 72px 20px; background: #151515; border-top: 1px solid #333; color: #fff; }
-        .saas-steps-inner { width: min(1120px, 100%); margin: 0 auto; text-align: center; }
-        .saas-steps-kicker { margin: 0 0 8px; color: var(--cf-yellow, #F6C500); font-weight: 800; text-transform: uppercase; letter-spacing: .16em; }
-        #saas-order-steps h2 { margin: 0 0 36px; font-size: clamp(2rem, 5vw, 4rem); line-height: 1; text-transform: uppercase; }
-        .saas-steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .saas-steps-grid article { padding: 28px 22px; background: #0e0e0e; border: 1px solid #333; border-bottom: 4px solid var(--cf-yellow, #F6C500); }
-        .saas-steps-grid strong { display: inline-grid; place-items: center; width: 54px; height: 54px; margin-bottom: 18px; border-radius: 50%; background: var(--cf-yellow, #F6C500); color: #0e0e0e; font-size: 1.65rem; }
-        .saas-steps-grid h3 { margin: 0 0 10px; color: #fff; font-size: 1.2rem; text-transform: uppercase; }
-        .saas-steps-grid p { margin: 0; color: #aaa; line-height: 1.55; }
-        @media (max-width: 760px) { .saas-steps-grid { grid-template-columns: 1fr; } }
+        #saas-order-steps {
+            position: relative;
+            isolation: isolate;
+            padding: 76px 24px 92px;
+            overflow: hidden;
+            color: #fff;
+            background: linear-gradient(rgba(20, 20, 20, .97), rgba(20, 20, 20, .97)), repeating-radial-gradient(circle at 20% 30%, #262626 0 1px, transparent 1px 4px);
+            border-top: 1px solid #222;
+            border-bottom: 8px solid var(--cf-yellow, #F6C500);
+        }
+        #saas-order-steps::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            opacity: .09;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitchTiles'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+        }
+        .saas-steps-inner { position: relative; width: min(1440px, 100%); margin: 0 auto; text-align: center; }
+        #saas-order-steps h2 {
+            position: relative;
+            z-index: 2;
+            margin: 0 0 42px;
+            color: #fff;
+            font-family: 'Anton', Impact, sans-serif !important;
+            font-size: clamp(2.7rem, 4.3vw, 4.6rem);
+            font-style: normal;
+            font-weight: 400;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: .01em;
+        }
+        #saas-order-steps h2 em { color: var(--cf-yellow, #F6C500); font-style: normal; }
+        .saas-steps-track {
+            position: absolute;
+            z-index: 0;
+            top: 156px;
+            left: -12vw;
+            width: calc(100% + 24vw);
+            height: 34px;
+            transform: rotate(-.2deg);
+            border-top: 3px dashed color-mix(in srgb, var(--cf-yellow, #F6C500) 38%, transparent);
+            border-radius: 50%;
+        }
+        .saas-steps-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: clamp(34px, 7vw, 130px);
+        }
+        .saas-steps-grid article { display: flex; flex-direction: column; align-items: center; min-width: 0; padding: 0; background: transparent; border: 0; }
+        .saas-step-icon {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 74px;
+            height: 74px;
+            margin: 0 0 20px;
+            color: #0e0e0e;
+            font-size: 1.85rem;
+            box-shadow: 0 0 0 3px #151515, 0 0 0 5px color-mix(in srgb, var(--cf-yellow, #F6C500) 58%, transparent);
+        }
+        .saas-step-icon::before {
+            content: '';
+            position: absolute;
+            top: -18px;
+            width: 32px;
+            height: 18px;
+            border: 2px solid color-mix(in srgb, var(--cf-yellow, #F6C500) 55%, transparent);
+            border-bottom: 0;
+            z-index: -1;
+        }
+        #saas-order-steps .saas-step-icon-yellow,
+        #saas-order-steps .saas-step-icon-white { border-radius: 50% !important; }
+        .saas-step-icon-yellow { background: var(--cf-yellow, #F6C500); }
+        .saas-step-icon-white { background: #f6f6f6; }
+        .saas-step-icon-square { background: var(--cf-yellow, #F6C500); transform: rotate(-2deg); }
+        .saas-step-icon-square i { transform: rotate(2deg); }
+        .saas-steps-grid h3 {
+            margin: 0 0 8px;
+            color: #fff;
+            font-family: 'Anton', Impact, sans-serif !important;
+            font-size: clamp(1.45rem, 2vw, 2rem);
+            font-weight: 400;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: .01em;
+        }
+        .saas-steps-grid p {
+            max-width: 440px;
+            margin: 0;
+            color: #9ca3af;
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: clamp(.9rem, 1.1vw, 1.05rem);
+            font-weight: 600;
+            line-height: 1.45;
+        }
+        @media (max-width: 760px) {
+            #saas-order-steps { padding: 58px 22px 66px; }
+            #saas-order-steps h2 { margin-bottom: 40px; }
+            .saas-steps-track {
+                top: 132px;
+                bottom: 48px;
+                left: 50%;
+                width: 1px;
+                height: auto;
+                border-top: 0;
+                border-left: 2px dashed color-mix(in srgb, var(--cf-yellow, #F6C500) 30%, transparent);
+                border-radius: 0;
+                transform: none;
+            }
+            .saas-steps-grid { grid-template-columns: 1fr; gap: 48px; }
+            .saas-steps-grid article { position: relative; }
+            .saas-steps-grid p { padding: 0 8px; }
+        }
     `;
     document.head.appendChild(style);
     footer.before(section);
