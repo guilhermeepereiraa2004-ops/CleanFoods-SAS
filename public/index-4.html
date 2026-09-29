@@ -618,6 +618,112 @@
                 padding: clamp(0.75rem, 1.5vh, 1rem) clamp(1.5rem, 3vh, 2rem) !important;
             }
         }
+
+        /* Tema 3: tipografia editorial preservando a composição original */
+        #hero-copy {
+            width: min(100%, 720px);
+        }
+
+        #hero-title {
+            padding-left: 1.35rem;
+            border-left: 4px solid var(--yellow);
+            font-family: 'Inter', sans-serif;
+            line-height: 1;
+            letter-spacing: 0;
+        }
+
+        #hero-title > span:nth-child(1) {
+            margin-bottom: 0.7rem !important;
+            font-size: clamp(0.8rem, 1vw, 0.92rem);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: 0.16em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #hero-title > span:nth-child(2),
+        #hero-title > span:nth-child(3) {
+            display: inline-block !important;
+            margin: 0 !important;
+            font-size: clamp(2.15rem, 4.05vw, 4.35rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.025em;
+            white-space: nowrap;
+        }
+
+        #hero-title > span:nth-child(2) {
+            margin-right: 0.16em !important;
+            color: var(--yellow);
+        }
+
+        #hero-title > span:nth-child(3) {
+            color: #fff;
+        }
+
+        #hero-title > span:nth-child(4) {
+            margin-top: 0.75rem !important;
+            font-size: clamp(0.8rem, 1vw, 0.92rem);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: 0.16em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #hero-subtitle {
+            max-width: 540px !important;
+            margin-top: 2rem !important;
+            padding-left: 1.6rem;
+            border-left: 0;
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: clamp(0.95rem, 1.35vw, 1.08rem) !important;
+            font-weight: 400;
+            line-height: 1.7;
+        }
+
+        #hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.9rem;
+            margin-top: 2.25rem;
+            border: 1px solid rgba(246, 197, 0, 0.72);
+            background: rgba(5, 5, 5, 0.28);
+            color: var(--yellow);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            backdrop-filter: blur(8px);
+            transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+        }
+
+        #hero-cta:hover {
+            transform: translateY(-2px);
+            background: var(--yellow);
+            color: #080808;
+        }
+
+        @media (max-width: 640px) {
+            #hero-title {
+                padding-left: 0.85rem;
+                border-left-width: 3px;
+            }
+
+            #hero-title > span:nth-child(2),
+            #hero-title > span:nth-child(3) {
+                display: inline-block !important;
+                font-size: clamp(2rem, 9.2vw, 2.4rem);
+            }
+
+            #hero-title > span:nth-child(2) {
+                margin-right: 0.12em !important;
+            }
+
+            #hero-title > span:nth-child(4) {
+                letter-spacing: 0.14em;
+            }
+
+            #hero-subtitle { padding-left: 1.05rem; }
+        }
     </style>
 <style id='saas-fouc-preventer'>body { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }</style>
 </head>
@@ -677,17 +783,19 @@
             <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent"></div>
         </div>
         <div class="container mx-auto px-4 relative z-10 pt-24">
-            <div class="max-w-xl">
-                <h1 id="hero-title" class="text-4xl md:text-6xl text-white font-serif tracking-widest uppercase" style="font-family: 'Playfair Display', serif; line-height: 1.2;">
+            <div id="hero-copy">
+                <h1 id="hero-title" class="text-white uppercase">
                     <span class="block font-light text-gray-500">A Arte da</span>
-                    <span class="block font-bold text-cf-yellow my-2">Alta Gastronomia</span>
-                    <span class="block font-light">Fitness</span>
-                    <span class="hidden">PESADO</span>
+                    <span class="block">Alta</span>
+                    <span class="block">Gastronomia</span>
+                    <span class="block">Fitness</span>
                 </h1>
                 <p id="hero-subtitle" class="text-gray-400 mt-6 text-lg font-light leading-relaxed">
-                    Experiência premium em cada refeição. O balanço perfeito entre nutrição de elite e sabor inesquecível.
+                    Alta gastronomia, nutrição inteligente e sabor de verdade — preparados para acompanhar o ritmo da sua rotina.
                 </p>
-                <a href="#cardapio" class="mt-10 inline-block border border-cf-yellow text-cf-yellow px-10 py-4 uppercase tracking-widest hover:bg-cf-yellow hover:text-black transition duration-300">Descobrir Menu</a>
+                <a href="#cardapio" id="hero-cta" class="px-9 py-4 uppercase">
+                    Explorar cardápio <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
             </div>
         </div>
     </section>

@@ -71,7 +71,7 @@ export default function MasterAdminPage() {
       id: crypto.randomUUID(),
       name: newTenant.name,
       slug: newTenant.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
-      theme: 'design1',
+      theme: 'design2',
       primaryColor: '#F6C500',
       fontFamily: 'Inter',
       adminUser: newTenant.adminUser,

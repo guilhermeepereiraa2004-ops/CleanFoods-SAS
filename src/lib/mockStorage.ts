@@ -52,7 +52,11 @@ export const saveMasterConfig = (config: MasterConfig) => {
 
 export const getTenants = (): Tenant[] => {
   if (typeof window === 'undefined') return [];
-  return JSON.parse(localStorage.getItem('saas_tenants') || '[]');
+  const tenants: Tenant[] = JSON.parse(localStorage.getItem('saas_tenants') || '[]');
+
+  return tenants.map(tenant =>
+    tenant.theme === 'design1' ? { ...tenant, theme: 'design2' } : tenant
+  );
 };
 
 export const saveTenant = (tenant: Tenant) => {
@@ -89,7 +93,7 @@ if (typeof window !== 'undefined') {
       id: 'tenant-1',
       slug: 'demo',
       name: 'CleanFoods Demo',
-      theme: 'design1',
+      theme: 'design2',
       primaryColor: '#F6C500',
       fontFamily: '--font-inter',
       createdAt: new Date().toISOString()

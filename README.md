@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CleanFoods SaaS
 
-## Getting Started
+Aplicação multi-tenant construída com Next.js 16 e preparada para acessar o Supabase no navegador e no servidor.
 
-First, run the development server:
+## Desenvolvimento
+
+Requisitos:
+
+- Node.js 22 ou superior
+- Um projeto no Supabase
+
+Instale as dependências e inicie o servidor:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A aplicação ficará disponível em [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Configuração do Supabase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Copie `.env.example` para `.env.local`.
+2. No painel do Supabase, abra **Project Settings > API** (ou o diálogo **Connect**).
+3. Preencha a URL do projeto e a chave **publishable**:
 
-## Learn More
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://SEU_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_SUA_CHAVE_PUBLICA
+```
 
-To learn more about Next.js, take a look at the following resources:
+Essas duas variáveis podem ser usadas pelo navegador. Nunca adicione uma chave `secret` ou `service_role` a uma variável `NEXT_PUBLIC_*`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Operações internas que realmente precisam ignorar RLS podem usar `createAdminClient` de `@/lib/supabase/admin`. Esse cliente aceita `SUPABASE_URL` e `SUPABASE_SECRET_KEY`, existe somente no servidor e deve ser chamado apenas depois de uma verificação explícita de autorização.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Uso em Server Components, Server Actions e Route Handlers
 
-## Deploy on Vercel
+Crie o cliente dentro da requisição:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```ts
+import { createClient } from '@/lib/supabase/server';
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+const supabase = await createClient();
+const { data, error } = await supabase.from('tabela').select('*');
+```
+
+### Uso em Client Components
+
+```ts
+'use client';
+
+import { createClient } from '@/lib/supabase/client';
+
+const supabase = createClient();
+```
+
+Os módulos ficam separados para impedir que APIs exclusivas do servidor sejam importadas pelo navegador. O cliente do servidor é criado por requisição para que cookies e sessões nunca sejam compartilhados entre usuários.
+
+O proxy de renovação de sessão deve ser adicionado junto com as rotas de autenticação. Para consultas ao banco sem sessão de usuário, os clientes acima já estão prontos.
+
+## Estado da migração
+
+A infraestrutura de conexão está pronta, mas as telas atuais ainda usam `src/lib/mockStorage.ts` e `localStorage`. A próxima etapa é definir o schema multi-tenant, criar migrations e políticas RLS, gerar os tipos TypeScript a partir do projeto Supabase e substituir o armazenamento simulado gradualmente.
+
+O schema inicial está em `supabase/cleanfoods_schema.sql`. Ele deve ser executado uma vez no SQL Editor do Supabase e contém tabelas multi-tenant, índices, RLS, privilégios da Data API e o bucket de imagens.
+
+Ao criar tabelas no schema `public`:
+
+- habilite RLS em todas elas;
+- crie políticas com isolamento por tenant e usuário;
+- confirme se `anon` e `authenticated` possuem acesso à Data API, pois projetos recentes não expõem tabelas novas automaticamente;
+- nunca armazene senhas dos administradores em texto puro; use Supabase Auth.

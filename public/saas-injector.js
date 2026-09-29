@@ -24,6 +24,9 @@ function initSaas() {
         return;
     }
 
+    // O primeiro tema foi descontinuado; lojas antigas passam a usar o Tema 2.
+    if (!tenant.theme || tenant.theme === 'design1') tenant.theme = 'design2';
+
     const isAdmin = window.location.pathname.includes('admin.html');
 
     // ========================================================
@@ -150,7 +153,7 @@ function initSaas() {
             'design1': ['Dieta', 'LIMPA', 'Treino', 'PESADO.'],
             'design2': ['Comida.', 'Treino.', 'Foco.', 'Resultados.'],
             'design3': ['NO PAIN', 'No Gain', 'Pra quem treina pesado', ''],
-            'design4': ['A Arte da', 'Alta Gastronomia', 'Fitness', ''],
+            'design4': ['A Arte da', 'Alta', 'Gastronomia', 'Fitness'],
             'design5': ['Future', 'FUEL', '', ''],
             'design6': ['O Combustível', 'do seu Corpo.', '', ''],
             'design7': ['MÁXIMA', 'PERFORMANCE', 'GARANTIDA.', ''],
@@ -166,17 +169,29 @@ function initSaas() {
             if (heroTitle) {
                 const spans = heroTitle.querySelectorAll('span');
                 if (spans.length >= 4) {
-                    const currentTheme = tenant.theme || 'design1';
-                    const defaults = themeDefaults[currentTheme] || themeDefaults['design1'];
+                    const currentTheme = tenant.theme || 'design2';
+                    const defaults = themeDefaults[currentTheme] || themeDefaults['design2'];
+                    const usesLegacyDesign4Copy = currentTheme === 'design4'
+                        && tenant.heroWord2 === 'Alta Gastronomia'
+                        && tenant.heroWord3 === 'Fitness'
+                        && !tenant.heroWord4;
+                    const heroWords = usesLegacyDesign4Copy
+                        ? defaults
+                        : [
+                            tenant.heroWord1 || defaults[0],
+                            tenant.heroWord2 || defaults[1],
+                            tenant.heroWord3 || defaults[2],
+                            tenant.heroWord4 || defaults[3]
+                        ];
 
-                    spans[0].innerText = tenant.heroWord1 || defaults[0];
+                    spans[0].innerText = heroWords[0];
 
-                    const w2 = tenant.heroWord2 || defaults[1];
+                    const w2 = heroWords[1];
                     spans[1].innerText = w2;
                     spans[1].setAttribute('data-text', w2);
 
-                    spans[2].innerText = tenant.heroWord3 || defaults[2];
-                    spans[3].innerText = tenant.heroWord4 || defaults[3];
+                    spans[2].innerText = heroWords[2];
+                    spans[3].innerText = heroWords[3];
 
                     // Aplica cor e tamanho customizados
                     if (tenant.heroFontColor && tenant.heroFontColor !== '#ffffff') {
@@ -203,7 +218,7 @@ function initSaas() {
 
                     // Oculta spans vazios
                     spans.forEach(span => {
-                        if (!span.innerText.trim()) {
+                        if (!span.textContent.trim()) {
                             span.style.display = 'none';
                         } else {
                             span.style.display = 'block';
@@ -222,9 +237,15 @@ function initSaas() {
                 heroTitle.insertAdjacentElement('afterend', subtitleEl);
             }
 
-            if (subtitleEl && tenant.heroSubtitle !== undefined) {
-                subtitleEl.innerText = tenant.heroSubtitle;
-                if (!tenant.heroSubtitle.trim()) {
+            const legacySubtitle = 'Marmitas fitness reais para quem treina de verdade. Sem glúten, sem lactose.';
+            const design4Subtitle = 'Alta gastronomia, nutrição inteligente e sabor de verdade — preparados para acompanhar o ritmo da sua rotina.';
+            const resolvedSubtitle = tenant.theme === 'design4' && tenant.heroSubtitle === legacySubtitle
+                ? design4Subtitle
+                : tenant.heroSubtitle;
+
+            if (subtitleEl && resolvedSubtitle !== undefined) {
+                subtitleEl.innerText = resolvedSubtitle;
+                if (!resolvedSubtitle.trim()) {
                     subtitleEl.style.display = 'none';
                 } else {
                     subtitleEl.style.display = 'block';
@@ -351,7 +372,7 @@ function initSaas() {
             'design1': ['Dieta', 'LIMPA', 'Treino', 'PESADO.'],
             'design2': ['Comida.', 'Treino.', 'Foco.', 'Resultados.'],
             'design3': ['NO PAIN', 'No Gain', 'Pra quem treina pesado', ''],
-            'design4': ['A Arte da', 'Alta Gastronomia', 'Fitness', ''],
+            'design4': ['A Arte da', 'Alta', 'Gastronomia', 'Fitness'],
             'design5': ['Future', 'FUEL', '', ''],
             'design6': ['O Combustível', 'do seu Corpo.', '', ''],
             'design7': ['MÁXIMA', 'PERFORMANCE', 'GARANTIDA.', ''],
@@ -417,19 +438,19 @@ function initSaas() {
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 1</label>
-                                        <input type="text" id="saas-hero-1" value="${(tenant.heroWord1 !== undefined && tenant.heroWord1 !== '') ? tenant.heroWord1 : (themeDefaults[tenant.theme || 'design1'] || themeDefaults['design1'])[0]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-1" value="${(tenant.heroWord1 !== undefined && tenant.heroWord1 !== '') ? tenant.heroWord1 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[0]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 2</label>
-                                        <input type="text" id="saas-hero-2" value="${(tenant.heroWord2 !== undefined && tenant.heroWord2 !== '') ? tenant.heroWord2 : (themeDefaults[tenant.theme || 'design1'] || themeDefaults['design1'])[1]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-2" value="${(tenant.heroWord2 !== undefined && tenant.heroWord2 !== '') ? tenant.heroWord2 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[1]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 3</label>
-                                        <input type="text" id="saas-hero-3" value="${(tenant.heroWord3 !== undefined && tenant.heroWord3 !== '') ? tenant.heroWord3 : (themeDefaults[tenant.theme || 'design1'] || themeDefaults['design1'])[2]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-3" value="${(tenant.heroWord3 !== undefined && tenant.heroWord3 !== '') ? tenant.heroWord3 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[2]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-400 mb-1">Palavra 4</label>
-                                        <input type="text" id="saas-hero-4" value="${(tenant.heroWord4 !== undefined && tenant.heroWord4 !== '') ? tenant.heroWord4 : (themeDefaults[tenant.theme || 'design1'] || themeDefaults['design1'])[3]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
+                                        <input type="text" id="saas-hero-4" value="${(tenant.heroWord4 !== undefined && tenant.heroWord4 !== '') ? tenant.heroWord4 : (themeDefaults[tenant.theme || 'design2'] || themeDefaults['design2'])[3]}" class="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none">
                                     </div>
                                 </div>
                                 <div class="mt-4">
@@ -535,17 +556,16 @@ function initSaas() {
                             </div>
 
                             <div>
-                                <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Tema / Design Base (9 Opções)</label>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Tema / Design Base (8 Opções)</label>
                                 <select id="saas-theme" class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold focus:border-cf-yellow outline-none">
-                                    <option value="design1" ${tenant.theme === 'design1' ? 'selected' : ''}>1. Design Padrão (Efeito Rasgado)</option>
-                                    <option value="design2" ${tenant.theme === 'design2' ? 'selected' : ''}>2. Retrô Block (HQ)</option>
-                                    <option value="design3" ${tenant.theme === 'design3' ? 'selected' : ''}>3. Minimalista (Clean)</option>
-                                    <option value="design4" ${tenant.theme === 'design4' ? 'selected' : ''}>4. Lista Compacta</option>
-                                    <option value="design5" ${tenant.theme === 'design5' ? 'selected' : ''}>5. Sombra Elevada (Flutuante)</option>
-                                    <option value="design6" ${tenant.theme === 'design6' ? 'selected' : ''}>6. Neon Cyberpunk</option>
-                                    <option value="design7" ${tenant.theme === 'design7' ? 'selected' : ''}>7. Flat Moderno</option>
-                                    <option value="design8" ${tenant.theme === 'design8' ? 'selected' : ''}>8. Tipografia Maximizada</option>
-                                    <option value="design9" ${tenant.theme === 'design9' ? 'selected' : ''}>9. Suave e Arredondado</option>
+                                    <option value="design2" ${tenant.theme === 'design2' ? 'selected' : ''}>1. Retrô Block (HQ)</option>
+                                    <option value="design3" ${tenant.theme === 'design3' ? 'selected' : ''}>2. Minimalista (Clean)</option>
+                                    <option value="design4" ${tenant.theme === 'design4' ? 'selected' : ''}>3. Lista Compacta</option>
+                                    <option value="design5" ${tenant.theme === 'design5' ? 'selected' : ''}>4. Sombra Elevada (Flutuante)</option>
+                                    <option value="design6" ${tenant.theme === 'design6' ? 'selected' : ''}>5. Neon Cyberpunk</option>
+                                    <option value="design7" ${tenant.theme === 'design7' ? 'selected' : ''}>6. Flat Moderno</option>
+                                    <option value="design8" ${tenant.theme === 'design8' ? 'selected' : ''}>7. Tipografia Maximizada</option>
+                                    <option value="design9" ${tenant.theme === 'design9' ? 'selected' : ''}>8. Suave e Arredondado</option>
                                 </select>
                             </div>
                         </div>
@@ -609,7 +629,7 @@ function initSaas() {
                 // Preenche palavras padrão quando mudar o tema
                 document.getElementById('saas-theme').addEventListener('change', (e) => {
                     const selectedTheme = e.target.value;
-                    const defaults = themeDefaults[selectedTheme] || themeDefaults['design1'];
+                    const defaults = themeDefaults[selectedTheme] || themeDefaults['design2'];
                     document.getElementById('saas-hero-1').value = defaults[0];
                     document.getElementById('saas-hero-2').value = defaults[1];
                     document.getElementById('saas-hero-3').value = defaults[2];

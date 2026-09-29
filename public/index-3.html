@@ -618,6 +618,156 @@
                 padding: clamp(0.75rem, 1.5vh, 1rem) clamp(1.5rem, 3vh, 2rem) !important;
             }
         }
+
+        /* Tema 2: estrutura do Tema 1 com acabamento editorial próprio */
+        #hero {
+            isolation: isolate;
+            background: #151515;
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.55;
+            background:
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.11) 1px, transparent 1.5px) 0 0 / 30px 30px,
+                linear-gradient(115deg, transparent 0 42%, rgba(246, 197, 0, 0.055) 42% 58%, transparent 58%);
+            mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.28) 55%, transparent 82%);
+        }
+
+        #hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -18vw;
+            z-index: 0;
+            width: min(72vw, 920px);
+            aspect-ratio: 1;
+            pointer-events: none;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            opacity: 0.42;
+            background: repeating-radial-gradient(
+                circle,
+                transparent 0 42px,
+                rgba(255, 255, 255, 0.08) 43px 44px
+            );
+        }
+
+        #hero-title {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            font-family: 'Anton', sans-serif !important;
+            letter-spacing: -0.025em;
+            text-transform: uppercase;
+            transform: none !important;
+        }
+
+        #hero-title > span {
+            display: block;
+            visibility: visible;
+        }
+
+        #hero-title > span:nth-child(1) { color: #fff; }
+
+        #hero-title > span:nth-child(2) {
+            width: fit-content;
+            color: var(--yellow);
+        }
+
+        #hero-title > span:nth-child(3),
+        #hero-title > span:nth-child(4) {
+            max-width: 520px;
+            margin-top: 1rem !important;
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.95rem, 1.45vw, 1.2rem);
+            font-weight: 800;
+            line-height: 1.35;
+            letter-spacing: 0.11em;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        #hero-title > span:nth-child(4) { margin-top: 0.2rem !important; }
+
+        #hero-subtitle {
+            max-width: 470px !important;
+            margin-top: 1.25rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--yellow);
+            color: rgba(255, 255, 255, 0.68);
+            line-height: 1.65;
+        }
+
+        #hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--yellow);
+            color: #111;
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: 8px 8px 0 rgba(255, 255, 255, 0.13);
+            transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        #hero-cta:hover {
+            transform: translate(-2px, -2px);
+            background: #fff;
+            box-shadow: 11px 11px 0 var(--yellow);
+        }
+
+        #hero-image-container {
+            position: relative;
+            width: 100%;
+            max-width: 720px;
+            aspect-ratio: 4 / 3;
+            margin-inline: auto;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        #hero-image-container::before {
+            content: none;
+        }
+
+        #hero-image-container::after {
+            content: none;
+        }
+
+        #saas-hero-image {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0;
+            filter: none !important;
+            mix-blend-mode: normal !important;
+            transform: none;
+            transition: none;
+        }
+
+        #hero-image-container:hover #saas-hero-image { transform: none; }
+
+        @media (max-width: 1023px) {
+            #hero::before {
+                mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent 76%);
+            }
+
+            #hero::after {
+                right: -70vw;
+                width: 140vw;
+                opacity: 0.3;
+            }
+
+        }
     </style>
 <style id='saas-fouc-preventer'>body { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }</style>
 </head>
@@ -659,7 +809,7 @@
 
         <a href="#hero" class="cursor-hover flex justify-center -mt-2 md:-mt-6">
             <img src="Logonova.jpeg" alt="Cleanfoods Logo"
-                class="h-28 sm:h-36 md:h-44 lg:h-64 w-auto max-w-none md:max-w-full object-contain transition-all">
+                class="saas-logo h-28 sm:h-36 md:h-44 lg:h-64 w-auto max-w-none md:max-w-full object-contain transition-all">
         </a>
 
         <div class="flex items-center justify-end gap-3 sm:gap-4 md:gap-6 mt-1 md:mt-0">
@@ -671,20 +821,32 @@
         </div>
     </header>
 
-    <section class="relative min-h-screen flex items-center justify-center pb-12 bg-cf-darkgray" id="hero">
-        <div class="container mx-auto px-4 relative z-10 pt-24 grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <h1 id="hero-title" class="font-street text-[4rem] md:text-[6rem] text-white transform -rotate-2 leading-tight">
-                    <span class="block text-gray-400">NO PAIN</span>
-                    <span class="block text-cf-yellow uppercase mt-[-10px]">No Gain</span>
-                    <span class="block text-xl md:text-2xl font-body mt-6 text-white font-bold tracking-widest uppercase">Comida de verdade pra quem treina pesado.</span>
-                    <span class="hidden">PESADO</span>
+    <section class="relative min-h-screen flex items-center justify-center pb-12 overflow-hidden" id="hero">
+        <div id="hero-container" class="container mx-auto px-4 relative z-10 pt-24 grid lg:grid-cols-[55%_45%] gap-10 lg:gap-14 items-center">
+            <div id="hero-text-column" class="relative z-20 flex flex-col items-start min-w-0">
+                <h1 id="hero-title" class="text-[clamp(3.8rem,7vw,7.4rem)] font-black leading-[0.84] text-white uppercase tracking-tighter w-full">
+                    <span class="block">NO PAIN</span>
+                    <span class="block">NO GAIN</span>
+                    <span class="block">Comida de verdade pra quem treina pesado.</span>
+                    <span class="block"></span>
                 </h1>
-                <a href="#cardapio" class="mt-10 inline-block btn-street px-10 py-4 text-xl bg-cf-yellow text-black hover:scale-110 transition-transform">PEDIR AGORA</a>
+
+                <p id="hero-subtitle" class="font-body text-sm sm:text-base lg:text-lg font-semibold">
+                    Marmitas fitness reais para quem treina de verdade. Sem glúten, sem lactose.
+                </p>
+
+                <div class="mt-8 md:mt-10">
+                    <a href="#cardapio" id="hero-cta" class="px-8 py-4 md:px-10 md:py-5 text-lg md:text-xl cursor-hover">
+                        Ver cardápio <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
             </div>
-            <div class="relative w-full h-[500px]">
-                <div class="absolute inset-0 bg-cf-yellow transform translate-x-4 translate-y-4 z-0"></div>
-                <img id="saas-hero-image" src="Marmita gourmet.jpg" class="w-full h-full object-cover relative z-10 grayscale hover:grayscale-0 transition duration-500" alt="Produto Hero" style="clip-path: none;" />
+
+            <div class="relative z-10 w-full flex items-center justify-end py-12 lg:py-0">
+                <div id="hero-image-container">
+                    <img id="saas-hero-image" src="Marmita gourmet.jpg"
+                        alt="Marmita fitness colorida CleanFoods" style="clip-path: none;" />
+                </div>
             </div>
         </div>
     </section>
