@@ -116,7 +116,6 @@ async function initSaas() {
     // O Supabase é a fonte principal. Localmente ficam apenas credenciais legadas.
     const tenant = remoteTenant
         ? {
-            ...localTenant,
             ...remoteTenant,
             adminUser: localTenant?.adminUser,
             adminPassword: localTenant?.adminPassword,
