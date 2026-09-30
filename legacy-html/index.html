@@ -840,7 +840,7 @@
 
                     <div class="w-full text-center">
                         <h4 class="font-street text-2xl text-white mb-2 transform -rotate-2">Pra sair da rotina</h4>
-                        <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase mb-6 marker-highlight">
+                        <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase mb-6 marker-highlight" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">
                             Linha Gourmet</h3>
                         <p class="font-body text-gray-300 font-semibold mb-8">Sabor de refeição livre, macros de dieta
                             estrita. O bagulho é louco.</p>
@@ -869,7 +869,7 @@
                     <div class="w-full text-center">
                         <h4 class="font-street text-2xl text-cf-yellow mb-2 transform rotate-2">Comer bem é um estilo de
                             vida</h4>
-                        <h3 class="font-impact text-5xl md:text-6xl text-white uppercase mb-4">
+                        <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase mb-4" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">
                             Salgados <span class="text-cf-yellow">e Doces Proteicos</span></h3>
                         <p class="font-body text-gray-300 font-semibold mb-2">Qualidade real em cada mordida. Sem culpa,
                             sem exagero — só sabor com propósito.</p>
@@ -920,7 +920,7 @@
                             class="w-24 h-24 mx-auto bg-cf-yellow text-cf-black rounded-full flex items-center justify-center text-4xl mb-6 shadow-lg transform -rotate-6 border-4 border-cf-black">
                             <i class="fa-solid fa-fire"></i>
                         </div>
-                        <h3 class="font-impact text-3xl text-white mb-2 uppercase">A Escolha</h3>
+                        <h3 class="font-impact text-3xl text-cf-yellow mb-2 uppercase" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">A Escolha</h3>
                         <p class="font-body text-gray-400 font-semibold">Monte seu arsenal. Escolha entre frango,
                             patinho ou linha gourmet direto pelo site.</p>
                     </div>
@@ -936,7 +936,7 @@
                             class="w-24 h-24 mx-auto bg-white text-cf-black rounded-full flex items-center justify-center text-4xl mb-6 shadow-lg transform rotate-6 border-4 border-cf-black">
                             <i class="fa-solid fa-mobile-screen"></i>
                         </div>
-                        <h3 class="font-impact text-3xl text-white mb-2 uppercase">O Pedido</h3>
+                        <h3 class="font-impact text-3xl text-cf-yellow mb-2 uppercase" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">O Pedido</h3>
                         <p class="font-body text-gray-400 font-semibold">Atendimento direto, sem enrolação. Mandou
                             mensagem, fechou o kit.</p>
                     </div>
@@ -952,7 +952,7 @@
                             class="w-24 h-24 mx-auto bg-cf-yellow text-cf-black flex items-center justify-center text-4xl mb-6 shadow-lg transform -rotate-3 border-4 border-cf-black torn-edge">
                             <i class="fa-solid fa-box-open"></i>
                         </div>
-                        <h3 class="font-impact text-3xl text-white mb-2 uppercase">O Recebimento</h3>
+                        <h3 class="font-impact text-3xl text-cf-yellow mb-2 uppercase" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">O Recebimento</h3>
                         <p class="font-body text-gray-400 font-semibold">Chega congelado, pronto pra aquecer. Só focar
                             no treino, a dieta tá garantida.</p>
                     </div>
@@ -1021,7 +1021,7 @@
         class="fixed top-0 right-0 h-[100dvh] w-full max-w-md bg-cf-darkgray border-l-4 border-cf-yellow z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
         <!-- Drawer Header -->
         <div class="p-4 sm:p-6 border-b border-cf-gray flex justify-between items-center bg-cf-black">
-            <h3 class="font-impact text-2xl text-cf-yellow uppercase tracking-wider flex items-center gap-2">
+            <h3 class="font-impact text-2xl text-cf-yellow uppercase tracking-wider flex items-center gap-2" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">
                 <i class="fa-solid fa-basket-shopping"></i> Seu Carrinho
             </h3>
             <button onclick="toggleCart()"
@@ -1158,7 +1158,7 @@
 
             <!-- Modal Title -->
             <div class="border-b-4 border-cf-yellow pb-4 mb-6">
-                <h3 class="font-impact text-3xl text-white uppercase tracking-widest flex items-center gap-3">
+                <h3 class="font-impact text-3xl text-cf-yellow uppercase tracking-widest flex items-center gap-3" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">
                     <span class="bg-cf-yellow text-cf-black px-2.5 py-1 text-xl flex items-center rounded-sm"><i
                             class="fa-solid fa-list-check"></i></span>
                     Finalizar Pedido
@@ -1322,7 +1322,7 @@
 
             <!-- Payment Step Container -->
             <div id="payment-step-container" class="hidden mt-4 pt-4 border-t-2 border-dashed border-cf-gray">
-                <h3 class="font-impact text-2xl text-white uppercase tracking-widest text-center mb-6">Pagamento</h3>
+                <h3 class="font-impact text-2xl text-cf-yellow uppercase tracking-widest text-center mb-6" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">Pagamento</h3>
 
                 <!-- Payment Method Selector -->
                 <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-6">
@@ -1850,8 +1850,10 @@ if (typeof renderMenu === 'function') renderMenu();
         }
 
         async function loadSettings() {
-            let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
+                        let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
             let savedAddress = localStorage.getItem('cleanfoods_address');
+            let savedInstagram = localStorage.getItem('cleanfoods_instagram');
+            let savedInstagramLink = localStorage.getItem('cleanfoods_instagram_link');
             let savedFrete = localStorage.getItem('cleanfoods_frete');
 
             if (supabaseClient) {
@@ -1863,6 +1865,10 @@ if (typeof renderMenu === 'function') renderMenu();
                         if (waSetting) savedWhatsapp = waSetting.value;
                         const addrSetting = data.find(s => s.key === 'address');
                         if (addrSetting) savedAddress = addrSetting.value;
+                        const instaSetting = data.find(s => s.key === 'instagram');
+                        if (instaSetting) savedInstagram = instaSetting.value;
+                        const instaLinkSetting = data.find(s => s.key === 'instagram_link');
+                        if (instaLinkSetting) savedInstagramLink = instaLinkSetting.value;
                         const freteSetting = data.find(s => s.key === 'frete');
                         if (freteSetting) savedFrete = freteSetting.value;
                     }
@@ -1875,17 +1881,28 @@ if (typeof renderMenu === 'function') renderMenu();
             else window.systemShippingFee = 0;
 
             if (savedWhatsapp) {
+                const cleanWa = savedWhatsapp.replace(/\D/g, '');
                 const waLinks = document.querySelectorAll('a[href*="wa.me/"]');
                 waLinks.forEach(link => {
-                    link.href = 'https://wa.me/55' + savedWhatsapp;
+                    link.href = 'https://wa.me/55' + cleanWa;
                 });
                 const textSpan = document.getElementById('val-whatsapp-text');
-                if (textSpan && savedWhatsapp.length >= 10) {
-                    const ddd = savedWhatsapp.substring(0, 2);
-                    const prefix = savedWhatsapp.length === 11 ? savedWhatsapp.substring(2, 7) : savedWhatsapp.substring(2, 6);
-                    const suffix = savedWhatsapp.length === 11 ? savedWhatsapp.substring(7) : savedWhatsapp.substring(6);
+                if (textSpan && cleanWa.length >= 10) {
+                    const ddd = cleanWa.substring(0, 2);
+                    const prefix = cleanWa.length === 11 ? cleanWa.substring(2, 7) : cleanWa.substring(2, 6);
+                    const suffix = cleanWa.length === 11 ? cleanWa.substring(7) : cleanWa.substring(6);
                     textSpan.innerText = `(${ddd}) ${prefix}-${suffix}`;
                 }
+            }
+
+            if (savedInstagram) {
+                const instaLinks = document.querySelectorAll('a[href*="instagram.com"]');
+                const handle = savedInstagram.startsWith('@') ? savedInstagram.substring(1) : savedInstagram;
+                const linkUrl = savedInstagramLink ? savedInstagramLink : 'https://www.instagram.com/' + handle + '/';
+                instaLinks.forEach(link => {
+                    link.href = linkUrl;
+                    link.innerHTML = '<i class="fa-brands fa-instagram text-3xl mr-4 text-cf-yellow"></i> @' + handle;
+                });
             }
 
             if (savedAddress) {
@@ -2319,7 +2336,7 @@ if (typeof renderMenu === 'function') renderMenu();
             return 0;
         }
 
-        async function loadSettings() {
+        async function loadShipping() {
             let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
             let savedAddress = localStorage.getItem('cleanfoods_address');
             let savedFrete = localStorage.getItem('cleanfoods_frete');

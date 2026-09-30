@@ -706,19 +706,19 @@
 
             <!-- Navigation categories (Sticky) -->
             <div class="sticky top-0 z-40 bg-cf-black/95 backdrop-blur-md py-4 border-b border-gray-800 mb-12 shadow-[0_10px_30px_rgba(0,0,0,0.5)] -mx-4 px-4 sm:mx-0 sm:px-0">
-                <div class="flex overflow-x-auto gap-3 hide-scrollbar snap-x items-center" id="category-filters">
-                    <button onclick="filterMenu('all')" id="btn-filter-all" class="snap-start shrink-0 px-6 py-2 rounded-full border border-cf-yellow bg-cf-yellow text-cf-black font-impact uppercase tracking-wider hover:bg-transparent hover:text-cf-yellow transition-colors cursor-pointer">Todos</button>
-                    <button onclick="filterMenu('combos')" id="btn-filter-combos" class="snap-start shrink-0 px-6 py-2 rounded-full border border-gray-600 bg-transparent text-white font-impact uppercase tracking-wider hover:border-white transition-colors cursor-pointer">Combos</button>
-                    <button onclick="filterMenu('frango')" id="btn-filter-frango" class="snap-start shrink-0 px-6 py-2 rounded-full border border-gray-600 bg-transparent text-white font-impact uppercase tracking-wider hover:border-white transition-colors cursor-pointer">Linha Frango</button>
-                    <button onclick="filterMenu('patinho')" id="btn-filter-patinho" class="snap-start shrink-0 px-6 py-2 rounded-full border border-gray-600 bg-transparent text-white font-impact uppercase tracking-wider hover:border-white transition-colors cursor-pointer">Linha Patinho</button>
-                    <button onclick="filterMenu('gourmet')" id="btn-filter-gourmet" class="snap-start shrink-0 px-6 py-2 rounded-full border border-gray-600 bg-transparent text-white font-impact uppercase tracking-wider hover:border-white transition-colors cursor-pointer">Linha Gourmet</button>
-                    <button onclick="filterMenu('salgados')" id="btn-filter-salgados" class="snap-start shrink-0 px-6 py-2 rounded-full border border-gray-600 bg-transparent text-white font-impact uppercase tracking-wider hover:border-white transition-colors cursor-pointer">Salgados e Doces</button>
+                <div class="flex overflow-x-auto gap-4 hide-scrollbar snap-x items-center py-2" id="category-filters">
+                    <button onclick="filterMenu('all')" id="btn-filter-all" class="snap-start shrink-0 px-6 py-2.5 rounded-full border border-cf-yellow/50 bg-cf-yellow/10 text-cf-yellow font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(246,197,0,0.4)] backdrop-blur-md hover:bg-cf-yellow hover:text-cf-black hover:shadow-[0_0_30px_rgba(246,197,0,0.8)] transition-all duration-300 cursor-pointer">Todos</button>
+                    <button onclick="filterMenu('combos')" id="btn-filter-combos" class="snap-start shrink-0 px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-gray-300 font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/15 hover:text-white hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300 cursor-pointer">Combos</button>
+                    <button onclick="filterMenu('frango')" id="btn-filter-frango" class="snap-start shrink-0 px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-gray-300 font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/15 hover:text-white hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300 cursor-pointer">Linha Frango</button>
+                    <button onclick="filterMenu('patinho')" id="btn-filter-patinho" class="snap-start shrink-0 px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-gray-300 font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/15 hover:text-white hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300 cursor-pointer">Linha Patinho</button>
+                    <button onclick="filterMenu('gourmet')" id="btn-filter-gourmet" class="snap-start shrink-0 px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-gray-300 font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/15 hover:text-white hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300 cursor-pointer">Linha Gourmet</button>
+                    <button onclick="filterMenu('salgados')" id="btn-filter-salgados" class="snap-start shrink-0 px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-gray-300 font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/15 hover:text-white hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300 cursor-pointer">Salgados e Doces</button>
                 </div>
             </div>
 
             <!-- Global Title (Visible only when 'all' is selected) -->
             <div id="todos-title" class="mb-12 text-center">
-                <h2 class="font-impact text-5xl md:text-6xl text-white uppercase tracking-wider">Cardápio <span class="text-cf-yellow font-impact">Completo</span></h2>
+                <h2 class="font-impact text-5xl md:text-6xl text-white uppercase tracking-wider" style="font-family: \'Anton\', Impact, sans-serif !important;">Cardápio <span class="text-cf-yellow font-impact" style="font-family: \'Anton\', Impact, sans-serif !important;">Completo</span></h2>
                 <p class="font-body text-gray-400 mt-2 text-lg">Todas as opções disponíveis para o seu treino.</p>
                 <div class="w-24 h-1 bg-cf-yellow mx-auto mt-6"></div>
             </div>
@@ -726,7 +726,7 @@
             <!-- Sections -->
             <div id="section-combos" class="scroll-mt-24 mb-20">
                 <div class="mb-12 text-center section-title">
-                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider">Combos</h3>
+                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">Combos</h3>
                     <p class="font-body text-gray-400 mt-2 text-lg">Mais sabor, mais economia!</p>
                     <div class="w-24 h-1 bg-cf-yellow mx-auto mt-6"></div>
                 </div>
@@ -737,9 +737,9 @@
 
             <div id="section-frango" class="scroll-mt-24 mb-20">
                 <div class="mb-12 text-center section-title">
-                    <h3 class="font-impact text-5xl md:text-6xl text-white uppercase tracking-wider">Linha Frango</h3>
+                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">Linha Frango</h3>
                     <p class="font-body text-gray-400 mt-2 text-lg">O clássico que não falha.</p>
-                    <div class="w-24 h-1 bg-white mx-auto mt-6"></div>
+                    <div class="w-24 h-1 bg-cf-yellow mx-auto mt-6"></div>
                 </div>
                 <div id="menu-frango-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     <!-- Dynamic items -->
@@ -748,7 +748,7 @@
             
             <div id="section-patinho" class="scroll-mt-24 mb-20">
                 <div class="mb-12 text-center section-title">
-                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider">Linha Patinho</h3>
+                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">Linha Patinho</h3>
                     <p class="font-body text-gray-400 mt-2 text-lg">Proteína magra e saborosa.</p>
                     <div class="w-24 h-1 bg-cf-yellow mx-auto mt-6"></div>
                 </div>
@@ -759,9 +759,9 @@
 
             <div id="section-gourmet" class="scroll-mt-24 mb-20">
                 <div class="mb-12 text-center section-title">
-                    <h3 class="font-impact text-5xl md:text-6xl text-white uppercase tracking-wider">Linha Gourmet</h3>
+                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">Linha Gourmet</h3>
                     <p class="font-body text-gray-400 mt-2 text-lg">Para sair da rotina na dieta.</p>
-                    <div class="w-24 h-1 bg-white mx-auto mt-6"></div>
+                    <div class="w-24 h-1 bg-cf-yellow mx-auto mt-6"></div>
                 </div>
                 <div id="menu-gourmet-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     <!-- Dynamic items -->
@@ -770,7 +770,7 @@
 
             <div id="section-salgados" class="scroll-mt-24 mb-10">
                 <div class="mb-12 text-center section-title">
-                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider">Salgados e Doces</h3>
+                    <h3 class="font-impact text-5xl md:text-6xl text-cf-yellow uppercase tracking-wider" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">Salgados e Doces</h3>
                     <p class="font-body text-gray-400 mt-2 text-lg">Lanches rápidos e proteicos.</p>
                     <div class="w-24 h-1 bg-cf-yellow mx-auto mt-6"></div>
                 </div>
@@ -844,7 +844,7 @@
         class="fixed top-0 right-0 h-[100dvh] w-full max-w-md bg-cf-darkgray border-l-4 border-cf-yellow z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
         <!-- Drawer Header -->
         <div class="p-4 sm:p-6 border-b border-cf-gray flex justify-between items-center bg-cf-black">
-            <h3 class="font-impact text-2xl text-cf-yellow uppercase tracking-wider flex items-center gap-2">
+            <h3 class="font-impact text-2xl text-cf-yellow uppercase tracking-wider flex items-center gap-2" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">
                 <i class="fa-solid fa-basket-shopping"></i> Seu Carrinho
             </h3>
             <button onclick="toggleCart()"
@@ -981,7 +981,7 @@
 
             <!-- Modal Title -->
             <div class="border-b-4 border-cf-yellow pb-4 mb-6">
-                <h3 class="font-impact text-3xl text-white uppercase tracking-widest flex items-center gap-3">
+                <h3 class="font-impact text-3xl text-cf-yellow uppercase tracking-widest flex items-center gap-3" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">
                     <span class="bg-cf-yellow text-cf-black px-2.5 py-1 text-xl flex items-center rounded-sm"><i
                             class="fa-solid fa-list-check"></i></span>
                     Finalizar Pedido
@@ -1145,7 +1145,7 @@
 
             <!-- Payment Step Container -->
             <div id="payment-step-container" class="hidden mt-4 pt-4 border-t-2 border-dashed border-cf-gray">
-                <h3 class="font-impact text-2xl text-white uppercase tracking-widest text-center mb-6">Pagamento</h3>
+                <h3 class="font-impact text-2xl text-cf-yellow uppercase tracking-widest text-center mb-6" style="font-family: 'Anton', Impact, sans-serif !important; letter-spacing: 0.02em;">Pagamento</h3>
 
                 <!-- Payment Method Selector -->
                 <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-6">
@@ -1525,7 +1525,7 @@
                 <img src="${imgSrc}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale group-hover:grayscale-0">
             </div>
             <div class="pt-4 flex-1 flex flex-col justify-between border-b border-transparent group-hover:border-cf-yellow transition-colors">
-                <div class="text-base font-medium text-white uppercase mb-2 line-clamp-2">${dish.name}</div>
+                <div class="text-sm font-bold text-white uppercase mb-3 line-clamp-2">${dish.name}</div>
                 <div class="mt-auto pb-2">${priceOptionsHTML}</div>
             </div>
         `;
@@ -1542,7 +1542,7 @@
                 <img src="${imgSrc}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale group-hover:grayscale-0">
             </div>
             <div class="pt-4 flex-1 flex flex-col justify-between border-b border-transparent group-hover:border-cf-yellow transition-colors">
-                <div class="text-base font-medium text-white uppercase mb-2 line-clamp-2">${dish.name}</div>
+                <div class="text-sm font-bold text-white uppercase mb-3 line-clamp-2">${dish.name}</div>
                 <div class="mt-auto pb-2">${priceOptionsHTML}</div>
             </div>
         `;
@@ -1559,7 +1559,7 @@
                 <img src="${imgSrc}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale group-hover:grayscale-0">
             </div>
             <div class="pt-4 flex-1 flex flex-col justify-between border-b border-transparent group-hover:border-cf-yellow transition-colors">
-                <div class="text-base font-medium text-white uppercase mb-2 line-clamp-2">${dish.name}</div>
+                <div class="text-sm font-bold text-white uppercase mb-3 line-clamp-2">${dish.name}</div>
                 <div class="mt-auto pb-2">${priceOptionsHTML}</div>
             </div>
         `;
@@ -1665,8 +1665,10 @@ if (typeof renderMenu === 'function') renderMenu();
         }
 
         async function loadSettings() {
-            let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
+                        let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
             let savedAddress = localStorage.getItem('cleanfoods_address');
+            let savedInstagram = localStorage.getItem('cleanfoods_instagram');
+            let savedInstagramLink = localStorage.getItem('cleanfoods_instagram_link');
             let savedFrete = localStorage.getItem('cleanfoods_frete');
 
             if (supabaseClient) {
@@ -1678,6 +1680,10 @@ if (typeof renderMenu === 'function') renderMenu();
                         if (waSetting) savedWhatsapp = waSetting.value;
                         const addrSetting = data.find(s => s.key === 'address');
                         if (addrSetting) savedAddress = addrSetting.value;
+                        const instaSetting = data.find(s => s.key === 'instagram');
+                        if (instaSetting) savedInstagram = instaSetting.value;
+                        const instaLinkSetting = data.find(s => s.key === 'instagram_link');
+                        if (instaLinkSetting) savedInstagramLink = instaLinkSetting.value;
                         const freteSetting = data.find(s => s.key === 'frete');
                         if (freteSetting) savedFrete = freteSetting.value;
                     }
@@ -1690,17 +1696,28 @@ if (typeof renderMenu === 'function') renderMenu();
             else window.systemShippingFee = 0;
 
             if (savedWhatsapp) {
+                const cleanWa = savedWhatsapp.replace(/\D/g, '');
                 const waLinks = document.querySelectorAll('a[href*="wa.me/"]');
                 waLinks.forEach(link => {
-                    link.href = 'https://wa.me/55' + savedWhatsapp;
+                    link.href = 'https://wa.me/55' + cleanWa;
                 });
                 const textSpan = document.getElementById('val-whatsapp-text');
-                if (textSpan && savedWhatsapp.length >= 10) {
-                    const ddd = savedWhatsapp.substring(0, 2);
-                    const prefix = savedWhatsapp.length === 11 ? savedWhatsapp.substring(2, 7) : savedWhatsapp.substring(2, 6);
-                    const suffix = savedWhatsapp.length === 11 ? savedWhatsapp.substring(7) : savedWhatsapp.substring(6);
+                if (textSpan && cleanWa.length >= 10) {
+                    const ddd = cleanWa.substring(0, 2);
+                    const prefix = cleanWa.length === 11 ? cleanWa.substring(2, 7) : cleanWa.substring(2, 6);
+                    const suffix = cleanWa.length === 11 ? cleanWa.substring(7) : cleanWa.substring(6);
                     textSpan.innerText = `(${ddd}) ${prefix}-${suffix}`;
                 }
+            }
+
+            if (savedInstagram) {
+                const instaLinks = document.querySelectorAll('a[href*="instagram.com"]');
+                const handle = savedInstagram.startsWith('@') ? savedInstagram.substring(1) : savedInstagram;
+                const linkUrl = savedInstagramLink ? savedInstagramLink : 'https://www.instagram.com/' + handle + '/';
+                instaLinks.forEach(link => {
+                    link.href = linkUrl;
+                    link.innerHTML = '<i class="fa-brands fa-instagram text-3xl mr-4 text-cf-yellow"></i> @' + handle;
+                });
             }
 
             if (savedAddress) {
@@ -2134,7 +2151,7 @@ if (typeof renderMenu === 'function') renderMenu();
             return 0;
         }
 
-        async function loadSettings() {
+        async function loadShipping() {
             let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
             let savedAddress = localStorage.getItem('cleanfoods_address');
             let savedFrete = localStorage.getItem('cleanfoods_frete');
@@ -3607,8 +3624,8 @@ if (typeof renderMenu === 'function') renderMenu();
 </script>
     <script>
         function filterMenu(category, isInit = false) {
-            const btnActive = 'snap-start shrink-0 px-6 py-2 rounded-full border border-cf-yellow bg-cf-yellow text-cf-black font-impact uppercase tracking-wider hover:bg-transparent hover:text-cf-yellow transition-colors cursor-pointer';
-            const btnInactive = 'snap-start shrink-0 px-6 py-2 rounded-full border border-gray-600 bg-transparent text-white font-impact uppercase tracking-wider hover:border-white transition-colors cursor-pointer';
+            const btnActive = 'snap-start shrink-0 px-6 py-2.5 rounded-full border border-cf-yellow/50 bg-cf-yellow/10 text-cf-yellow font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(246,197,0,0.4)] backdrop-blur-md hover:bg-cf-yellow hover:text-cf-black hover:shadow-[0_0_30px_rgba(246,197,0,0.8)] transition-all duration-300 cursor-pointer';
+            const btnInactive = 'snap-start shrink-0 px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-gray-300 font-bold uppercase tracking-wider backdrop-blur-md hover:bg-white/15 hover:text-white hover:border-white/30 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300 cursor-pointer';
 
             const filters = ['all', 'combos', 'frango', 'patinho', 'gourmet', 'salgados'];
             filters.forEach(c => {

@@ -571,7 +571,81 @@ async function initSaas() {
                     }
                 }
             }
+
+            // === ATUALIZA CONTATOS DO RODAPÉ (WhatsApp, Instagram, Endereço) ===
+            // Aguarda o supabaseClient ser inicializado pela página (ele é criado num script inline DEPOIS do saas-injector)
+            setTimeout(async () => {
+                try {
+                    let waVal = null, addrVal = null, instaVal = null, instaLinkVal = null;
+
+                    // Agora o supabaseClient da página já deve estar disponível
+                    const pageClient = window.supabaseClient;
+                    if (pageClient) {
+                        try {
+                            const { data } = await pageClient.from('settings').select('*');
+                            if (data) {
+                                waVal = (data.find(s => s.key === 'whatsapp') || {}).value || null;
+                                addrVal = (data.find(s => s.key === 'address') || {}).value || null;
+                                instaVal = (data.find(s => s.key === 'instagram') || {}).value || null;
+                                instaLinkVal = (data.find(s => s.key === 'instagram_link') || {}).value || null;
+                            }
+                        } catch (_) {}
+                    }
+
+                    // Fallback: localStorage
+                    if (!waVal) waVal = localStorage.getItem('cleanfoods_whatsapp');
+                    if (!addrVal) addrVal = localStorage.getItem('cleanfoods_address');
+                    if (!instaVal) instaVal = localStorage.getItem('cleanfoods_instagram');
+                    if (!instaLinkVal) instaLinkVal = localStorage.getItem('cleanfoods_instagram_link');
+
+                    // Aplica WhatsApp
+                    if (waVal) {
+                        const cleanWa = waVal.replace(/\D/g, '');
+                        document.querySelectorAll('a[href*="wa.me/"]').forEach(link => {
+                            link.href = 'https://wa.me/55' + cleanWa;
+                        });
+                        const textSpan = document.getElementById('val-whatsapp-text');
+                        if (textSpan && cleanWa.length >= 10) {
+                            const ddd = cleanWa.substring(0, 2);
+                            const prefix = cleanWa.length === 11 ? cleanWa.substring(2, 7) : cleanWa.substring(2, 6);
+                            const suffix = cleanWa.length === 11 ? cleanWa.substring(7) : cleanWa.substring(6);
+                            textSpan.innerText = `(${ddd}) ${prefix}-${suffix}`;
+                        }
+                    }
+
+                    // Aplica Instagram
+                    if (instaVal) {
+                        const handle = instaVal.startsWith('@') ? instaVal.substring(1) : instaVal;
+                        const linkUrl = instaLinkVal || `https://www.instagram.com/${handle}/`;
+                        const instaLinks = document.querySelectorAll('a[href*="instagram.com"]');
+                        instaLinks.forEach(link => {
+                            link.href = linkUrl;
+                            const icon = link.querySelector('i.fa-instagram, i.fa-brands');
+                            if (icon) {
+                                const textNode = [...link.childNodes].find(n => n.nodeType === 3);
+                                if (textNode) {
+                                    textNode.textContent = ' @' + handle;
+                                } else {
+                                    link.innerHTML = '<i class="fa-brands fa-instagram text-3xl mr-4 text-cf-yellow"></i> @' + handle;
+                                }
+                            } else {
+                                link.innerHTML = '<i class="fa-brands fa-instagram text-3xl mr-4 text-cf-yellow"></i> @' + handle;
+                            }
+                        });
+                    }
+
+                    // Aplica Endereço
+                    if (addrVal) {
+                        const addressSpan = document.getElementById('val-address-text');
+                        if (addressSpan) addressSpan.innerText = addrVal;
+                    }
+                } catch (e) {
+                    console.warn('[saas] Erro ao atualizar contatos do rodapé:', e);
+                }
+            }, 800); // aguarda 800ms para garantir que o supabaseClient da página foi inicializado
         }
+
+
 
         // 5. Aplica os 9 Designs Dinâmicos
         const themeStyle = document.createElement('style');
