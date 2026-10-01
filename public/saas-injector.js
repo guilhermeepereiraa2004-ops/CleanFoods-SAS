@@ -31,6 +31,69 @@ async function revealStorefrontBranding() {
     document.documentElement.classList.add('saas-branding-ready');
 }
 
+function applyStorefrontContacts(tenant) {
+    const rawWhatsapp = typeof tenant.whatsapp === 'string' ? tenant.whatsapp : '';
+    const rawDigits = rawWhatsapp.replace(/\D/g, '');
+    const localDigits = rawDigits.startsWith('55') && rawDigits.length >= 12
+        ? rawDigits.substring(2)
+        : rawDigits;
+
+    if (localDigits) {
+        document.querySelectorAll('a[href*="wa.me/"]').forEach((link) => {
+            link.href = `https://wa.me/55${localDigits}`;
+        });
+
+        const textSpan = document.getElementById('val-whatsapp-text');
+        if (textSpan && localDigits.length >= 10) {
+            const ddd = localDigits.substring(0, 2);
+            const prefix = localDigits.length === 11
+                ? localDigits.substring(2, 7)
+                : localDigits.substring(2, 6);
+            const suffix = localDigits.length === 11
+                ? localDigits.substring(7)
+                : localDigits.substring(6);
+            textSpan.innerText = `(${ddd}) ${prefix}-${suffix}`;
+        }
+    } else {
+        const whatsappLink = document.querySelector('a[href*="wa.me/"]');
+        if (whatsappLink) whatsappLink.style.display = 'none';
+    }
+
+    const instagram = typeof tenant.instagram === 'string' ? tenant.instagram.trim() : '';
+    if (instagram) {
+        const displayName = instagram.startsWith('@') ? instagram : `@${instagram}`;
+        const handle = displayName.substring(1);
+        const instagramLink = typeof tenant.instagramLink === 'string' && tenant.instagramLink.trim()
+            ? tenant.instagramLink.trim()
+            : `https://www.instagram.com/${handle}/`;
+
+        document.querySelectorAll('i.fa-instagram').forEach((icon) => {
+            const link = icon.closest('a');
+            if (!link) return;
+            link.href = instagramLink;
+            const textNode = [...link.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+            if (textNode) textNode.textContent = ` ${displayName}`;
+            else link.append(document.createTextNode(` ${displayName}`));
+        });
+    } else {
+        document.querySelectorAll('i.fa-instagram').forEach((icon) => {
+            const link = icon.closest('a');
+            if (link) link.style.display = 'none';
+        });
+    }
+
+    if (typeof tenant.address === 'string' && tenant.address.trim()) {
+        const addressSpan = document.getElementById('val-address-text');
+        if (addressSpan) addressSpan.innerText = tenant.address.trim();
+    } else {
+        const addressSpan = document.getElementById('val-address-text');
+        if (addressSpan?.parentElement) addressSpan.parentElement.style.display = 'none';
+    }
+
+    document.documentElement.classList.remove('saas-contacts-pending');
+    document.documentElement.classList.add('saas-contacts-ready');
+}
+
 function optimizeStorefrontImage(file, maxWidth, maxHeight) {
     const maxDataUrlLength = 800000;
 
@@ -315,12 +378,13 @@ async function initSaas() {
     const localTenant = tenants.find(t => (t.slug || '').toLowerCase() === tenantSlug);
     let remoteTenant = null;
 
-    try {
-        const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`);
-        if (response.ok) remoteTenant = await response.json();
-    } catch (error) {
-        console.warn('Não foi possível atualizar os dados públicos da loja.', error);
-    }
+    window.cleanFoodsPublicTenantPromise = fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`, { cache: 'no-store' })
+        .then((response) => response.ok ? response.json() : null)
+        .catch((error) => {
+            console.warn('Não foi possível atualizar os dados públicos da loja.', error);
+            return null;
+        });
+    remoteTenant = await window.cleanFoodsPublicTenantPromise;
 
     // O Supabase é a fonte principal. Localmente ficam apenas credenciais legadas.
     const tenant = remoteTenant
@@ -592,77 +656,8 @@ async function initSaas() {
 
             await revealStorefrontBranding();
 
-            // === ATUALIZA CONTATOS DO RODAPÉ (WhatsApp, Instagram, Endereço) ===
-            // Aguarda o supabaseClient ser inicializado pela página (ele é criado num script inline DEPOIS do saas-injector)
-            setTimeout(async () => {
-                try {
-                    let waVal = null, addrVal = null, instaVal = null, instaLinkVal = null;
-
-                    // Agora o supabaseClient da página já deve estar disponível
-                    const pageClient = window.supabaseClient;
-                    if (pageClient) {
-                        try {
-                            const { data } = await pageClient.from('settings').select('*');
-                            if (data) {
-                                waVal = (data.find(s => s.key === 'whatsapp') || {}).value || null;
-                                addrVal = (data.find(s => s.key === 'address') || {}).value || null;
-                                instaVal = (data.find(s => s.key === 'instagram') || {}).value || null;
-                                instaLinkVal = (data.find(s => s.key === 'instagram_link') || {}).value || null;
-                            }
-                        } catch (_) {}
-                    }
-
-                    // Fallback: localStorage
-                    if (!waVal) waVal = localStorage.getItem('cleanfoods_whatsapp');
-                    if (!addrVal) addrVal = localStorage.getItem('cleanfoods_address');
-                    if (!instaVal) instaVal = localStorage.getItem('cleanfoods_instagram');
-                    if (!instaLinkVal) instaLinkVal = localStorage.getItem('cleanfoods_instagram_link');
-
-                    // Aplica WhatsApp
-                    if (waVal) {
-                        const cleanWa = waVal.replace(/\D/g, '');
-                        document.querySelectorAll('a[href*="wa.me/"]').forEach(link => {
-                            link.href = 'https://wa.me/55' + cleanWa;
-                        });
-                        const textSpan = document.getElementById('val-whatsapp-text');
-                        if (textSpan && cleanWa.length >= 10) {
-                            const ddd = cleanWa.substring(0, 2);
-                            const prefix = cleanWa.length === 11 ? cleanWa.substring(2, 7) : cleanWa.substring(2, 6);
-                            const suffix = cleanWa.length === 11 ? cleanWa.substring(7) : cleanWa.substring(6);
-                            textSpan.innerText = `(${ddd}) ${prefix}-${suffix}`;
-                        }
-                    }
-
-                    // Aplica Instagram
-                    if (instaVal) {
-                        const handle = instaVal.startsWith('@') ? instaVal.substring(1) : instaVal;
-                        const linkUrl = instaLinkVal || `https://www.instagram.com/${handle}/`;
-                        const instaLinks = document.querySelectorAll('a[href*="instagram.com"]');
-                        instaLinks.forEach(link => {
-                            link.href = linkUrl;
-                            const icon = link.querySelector('i.fa-instagram, i.fa-brands');
-                            if (icon) {
-                                const textNode = [...link.childNodes].find(n => n.nodeType === 3);
-                                if (textNode) {
-                                    textNode.textContent = ' @' + handle;
-                                } else {
-                                    link.innerHTML = '<i class="fa-brands fa-instagram text-3xl mr-4 text-cf-yellow"></i> @' + handle;
-                                }
-                            } else {
-                                link.innerHTML = '<i class="fa-brands fa-instagram text-3xl mr-4 text-cf-yellow"></i> @' + handle;
-                            }
-                        });
-                    }
-
-                    // Aplica Endereço
-                    if (addrVal) {
-                        const addressSpan = document.getElementById('val-address-text');
-                        if (addressSpan) addressSpan.innerText = addrVal;
-                    }
-                } catch (e) {
-                    console.warn('[saas] Erro ao atualizar contatos do rodapé:', e);
-                }
-            }, 800); // aguarda 800ms para garantir que o supabaseClient da página foi inicializado
+            // Os contatos já vêm vinculados ao tenant pela API pública.
+            applyStorefrontContacts(tenant);
         }
 
 
@@ -1075,7 +1070,11 @@ async function initSaas() {
                         heroFontSize: document.getElementById('saas-hero-size').value,
                         heroImageSize: document.getElementById('saas-hero-image-size').value,
                         footerCopyright: document.getElementById('saas-footer-copyright-input').value,
-                        footerCnpj: document.getElementById('saas-footer-cnpj-input').value
+                        footerCnpj: document.getElementById('saas-footer-cnpj-input').value,
+                        whatsapp: document.getElementById('config-whatsapp').value.trim(),
+                        address: document.getElementById('config-address').value.trim(),
+                        instagram: document.getElementById('config-instagram').value.trim(),
+                        instagramLink: document.getElementById('config-instagram-link').value.trim()
                     };
 
                     try {

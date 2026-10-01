@@ -820,7 +820,7 @@
                             <div class="flex gap-2">
                                 <span
                                     class="bg-cf-black border border-cf-gray text-gray-500 px-3 py-2 flex items-center rounded text-sm font-semibold">+55</span>
-                                <input type="text" id="config-whatsapp" value="11910993953"
+                                <input type="text" id="config-whatsapp" value=""
                                     class="flex-1 bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold">
                             </div>
                             <span class="text-[10px] text-gray-500 font-semibold block mt-1">Insira apenas os números
@@ -829,12 +829,12 @@
                         <div>
                             <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Localização da
                                 Unidade</label>
-                            <input type="text" id="config-address" value="Ipiranga, São Paulo - SP"
+                            <input type="text" id="config-address" value="" placeholder="Cidade, Estado - UF"
                                 class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold">
                         </div>
                         <div>
                             <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Nome do Instagram</label>
-                            <input type="text" id="config-instagram" value="@cleanfoods.saopaulo"
+                            <input type="text" id="config-instagram" value=""
                                 placeholder="@seuinstagram"
                                 class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold">
                             <span class="text-[10px] text-gray-500 font-semibold block mt-1">O nome pode ser informado com ou sem @.</span>
@@ -842,7 +842,7 @@
                         <div>
                             <label class="block text-xs uppercase font-bold text-gray-400 mb-2">Link do Instagram</label>
                             <input type="url" id="config-instagram-link"
-                                value="https://www.instagram.com/cleanfoods.saopaulo/"
+                                value=""
                                 placeholder="https://www.instagram.com/seuinstagram/" inputmode="url" autocomplete="url"
                                 class="w-full bg-cf-black text-white border border-cf-gray rounded px-3 py-2 font-bold">
                         </div>
@@ -1572,10 +1572,13 @@
             } catch (e) {}
 
             try {
-                const savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
-                const savedAddress = localStorage.getItem('cleanfoods_address');
-                const savedInstagram = localStorage.getItem('cleanfoods_instagram');
-                const savedInstagramLink = localStorage.getItem('cleanfoods_instagram_link');
+                const tenantSlug = new URLSearchParams(window.location.search).get('tenant')
+                    || sessionStorage.getItem('active_tenant');
+                const settingsPrefix = tenantSlug ? `cleanfoods_${tenantSlug}_` : 'cleanfoods_';
+                const savedWhatsapp = localStorage.getItem(`${settingsPrefix}whatsapp`);
+                const savedAddress = localStorage.getItem(`${settingsPrefix}address`);
+                const savedInstagram = localStorage.getItem(`${settingsPrefix}instagram`);
+                const savedInstagramLink = localStorage.getItem(`${settingsPrefix}instagram_link`);
                 if (savedWhatsapp) document.getElementById('config-whatsapp').value = savedWhatsapp;
                 if (savedAddress) document.getElementById('config-address').value = savedAddress;
                 if (savedInstagram) document.getElementById('config-instagram').value = savedInstagram;
@@ -2443,35 +2446,51 @@
         }
 
         async function loadSettings() {
-            let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
-            let savedAddress = localStorage.getItem('cleanfoods_address');
-            let savedInstagram = localStorage.getItem('cleanfoods_instagram');
-            let savedInstagramLink = localStorage.getItem('cleanfoods_instagram_link');
-            if (supabaseClient) {
-                try {
-                    const { data, error } = await supabaseClient.from('settings').select('*');
-                    if (error) throw error;
-                    if (data) {
-                        const waSetting = data.find(s => s.key === 'whatsapp');
-                        if (waSetting) savedWhatsapp = waSetting.value;
-                        const addrSetting = data.find(s => s.key === 'address');
-                        if (addrSetting) savedAddress = addrSetting.value;
-                        const instagramSetting = data.find(s => s.key === 'instagram');
-                        if (instagramSetting) savedInstagram = instagramSetting.value;
-                        const instagramLinkSetting = data.find(s => s.key === 'instagram_link');
-                        if (instagramLinkSetting) savedInstagramLink = instagramLinkSetting.value;
+            const activeTenantSlug = sessionStorage.getItem('active_tenant');
+            const settingsPrefix = activeTenantSlug ? `cleanfoods_${activeTenantSlug}_` : 'cleanfoods_';
+            let savedWhatsapp = localStorage.getItem(`${settingsPrefix}whatsapp`) || '';
+            let savedAddress = localStorage.getItem(`${settingsPrefix}address`) || '';
+            let savedInstagram = localStorage.getItem(`${settingsPrefix}instagram`) || '';
+            let savedInstagramLink = localStorage.getItem(`${settingsPrefix}instagram_link`) || '';
+
+            try {
+                const publicTenant = window.cleanFoodsPublicTenantPromise
+                    ? await window.cleanFoodsPublicTenantPromise
+                    : null;
+                if (publicTenant) {
+                    savedWhatsapp = typeof publicTenant.whatsapp === 'string' ? publicTenant.whatsapp : '';
+                    savedAddress = typeof publicTenant.address === 'string' ? publicTenant.address : '';
+                    savedInstagram = typeof publicTenant.instagram === 'string' ? publicTenant.instagram : '';
+                    savedInstagramLink = typeof publicTenant.instagramLink === 'string' ? publicTenant.instagramLink : '';
+
+                    // Migra configurações antigas, mas sempre filtrando pela unidade atual.
+                    if (supabaseClient && publicTenant.id
+                        && (!savedWhatsapp || !savedAddress || !savedInstagram || !savedInstagramLink)) {
+                        const { data: legacySettings, error: legacyError } = await supabaseClient
+                            .from('settings')
+                            .select('key,value')
+                            .eq('tenant_id', publicTenant.id)
+                            .in('key', ['whatsapp', 'address', 'instagram', 'instagram_link']);
+                        if (legacyError) throw legacyError;
+                        const legacyValue = (key) => {
+                            const value = legacySettings?.find((setting) => setting.key === key)?.value;
+                            return typeof value === 'string' ? value : '';
+                        };
+                        savedWhatsapp ||= legacyValue('whatsapp');
+                        savedAddress ||= legacyValue('address');
+                        savedInstagram ||= legacyValue('instagram');
+                        savedInstagramLink ||= legacyValue('instagram_link');
                     }
-                } catch (err) {
-                    console.error("Erro ao carregar configurações do Supabase:", err);
                 }
+            } catch (err) {
+                console.error("Erro ao carregar contatos da loja:", err);
             }
 
-            if (savedWhatsapp) document.getElementById('config-whatsapp').value = savedWhatsapp;
-            if (savedAddress) document.getElementById('config-address').value = savedAddress;
-            if (savedInstagram) document.getElementById('config-instagram').value = savedInstagram;
-            if (savedInstagramLink) document.getElementById('config-instagram-link').value = savedInstagramLink;
-            
-            const activeTenantSlug = sessionStorage.getItem('active_tenant');
+            document.getElementById('config-whatsapp').value = savedWhatsapp;
+            document.getElementById('config-address').value = savedAddress;
+            document.getElementById('config-instagram').value = savedInstagram;
+            document.getElementById('config-instagram-link').value = savedInstagramLink;
+
             if (activeTenantSlug) {
                 const tenants = JSON.parse(localStorage.getItem('saas_tenants') || '[]');
                 const tenant = tenants.find(t => t.slug === activeTenantSlug);
@@ -2513,22 +2532,13 @@
                 ? `https://${rawInstagramLink}`
                 : rawInstagramLink;
 
-            localStorage.setItem('cleanfoods_whatsapp', whatsapp);
-            localStorage.setItem('cleanfoods_address', address);
-            localStorage.setItem('cleanfoods_instagram', instagram);
-            localStorage.setItem('cleanfoods_instagram_link', instagramLink);
+            const activeTenantSlug = sessionStorage.getItem('active_tenant');
+            const settingsPrefix = activeTenantSlug ? `cleanfoods_${activeTenantSlug}_` : 'cleanfoods_';
+            localStorage.setItem(`${settingsPrefix}whatsapp`, whatsapp);
+            localStorage.setItem(`${settingsPrefix}address`, address);
+            localStorage.setItem(`${settingsPrefix}instagram`, instagram);
+            localStorage.setItem(`${settingsPrefix}instagram_link`, instagramLink);
             document.getElementById('config-instagram-link').value = instagramLink;
-
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.from('settings').upsert({ key: 'whatsapp', value: whatsapp });
-                    await supabaseClient.from('settings').upsert({ key: 'address', value: address });
-                    await supabaseClient.from('settings').upsert({ key: 'instagram', value: instagram });
-                    await supabaseClient.from('settings').upsert({ key: 'instagram_link', value: instagramLink });
-                } catch (err) {
-                    console.error("Erro ao salvar configurações no Supabase:", err);
-                }
-            }
 
             showToast('CONFIGURAÇÕES SALVAS COM SUCESSO!');
         }

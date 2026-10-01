@@ -21,7 +21,7 @@ export async function GET(
 
   return NextResponse.json(tenant, {
     headers: {
-      'Cache-Control': 'public, max-age=5, s-maxage=10, stale-while-revalidate=60',
+      'Cache-Control': 'no-store',
     },
   });
 }
@@ -47,9 +47,17 @@ type StorefrontConfiguration = {
   logoSize?: unknown;
   footerCopyright?: unknown;
   footerCnpj?: unknown;
+  whatsapp?: unknown;
+  address?: unknown;
+  instagram?: unknown;
+  instagramLink?: unknown;
 };
 
 const optionalText = (value: unknown) => typeof value === 'string' ? value : null;
+const optionalLink = (value: unknown) => {
+  const text = optionalText(value)?.trim() || '';
+  return text && !/^https?:\/\//i.test(text) ? `https://${text}` : text;
+};
 
 export async function PATCH(
   request: Request,
@@ -122,6 +130,35 @@ export async function PATCH(
   if (footerError) {
     console.error('Falha ao salvar rodapé da vitrine:', footerError.message);
     return NextResponse.json({ error: 'Não foi possível salvar o rodapé.' }, { status: 500 });
+  }
+
+  const hasContactConfiguration = [
+    input.whatsapp,
+    input.address,
+    input.instagram,
+    input.instagramLink,
+  ].some((value) => value !== undefined);
+
+  if (hasContactConfiguration) {
+    const { error: contactsError } = await adminClient.from('settings').upsert(
+      {
+        tenant_id: tenant.id,
+        key: 'storefront_contacts',
+        value: {
+          whatsapp: optionalText(input.whatsapp) ?? '',
+          address: optionalText(input.address) ?? '',
+          instagram: optionalText(input.instagram) ?? '',
+          instagramLink: optionalLink(input.instagramLink),
+        },
+        is_public: true,
+      },
+      { onConflict: 'tenant_id,key' },
+    );
+
+    if (contactsError) {
+      console.error('Falha ao salvar contatos da vitrine:', contactsError.message);
+      return NextResponse.json({ error: 'Não foi possível salvar os contatos.' }, { status: 500 });
+    }
   }
 
   console.info('[tenant-config] storefront configuration saved', {

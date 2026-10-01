@@ -312,3 +312,17 @@ html.saas-branding-ready body.storefront #saas-hero-image {
     visibility: visible;
     transition: opacity 180ms ease-out;
 }
+
+html.saas-contacts-pending body.storefront #val-whatsapp-text,
+html.saas-contacts-pending body.storefront #val-address-text,
+html.saas-contacts-pending body.storefront footer a:has(i.fa-instagram) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+html.saas-contacts-ready body.storefront #val-whatsapp-text,
+html.saas-contacts-ready body.storefront #val-address-text,
+html.saas-contacts-ready body.storefront footer a:has(i.fa-instagram) {
+    visibility: visible;
+    transition: opacity 180ms ease-out;
+}

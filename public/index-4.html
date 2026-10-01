@@ -1738,10 +1738,6 @@ if (typeof renderMenu === 'function') renderMenu();
         }
 
         async function loadSettings() {
-                        let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
-            let savedAddress = localStorage.getItem('cleanfoods_address');
-            let savedInstagram = localStorage.getItem('cleanfoods_instagram');
-            let savedInstagramLink = localStorage.getItem('cleanfoods_instagram_link');
             let savedFrete = localStorage.getItem('cleanfoods_frete');
 
             if (supabaseClient) {
@@ -1749,14 +1745,6 @@ if (typeof renderMenu === 'function') renderMenu();
                     const { data, error } = await supabaseClient.from('settings').select('*');
                     if (error) throw error;
                     if (data) {
-                        const waSetting = data.find(s => s.key === 'whatsapp');
-                        if (waSetting) savedWhatsapp = waSetting.value;
-                        const addrSetting = data.find(s => s.key === 'address');
-                        if (addrSetting) savedAddress = addrSetting.value;
-                        const instaSetting = data.find(s => s.key === 'instagram');
-                        if (instaSetting) savedInstagram = instaSetting.value;
-                        const instaLinkSetting = data.find(s => s.key === 'instagram_link');
-                        if (instaLinkSetting) savedInstagramLink = instaLinkSetting.value;
                         const freteSetting = data.find(s => s.key === 'frete');
                         if (freteSetting) savedFrete = freteSetting.value;
                     }
@@ -1768,35 +1756,6 @@ if (typeof renderMenu === 'function') renderMenu();
             if (savedFrete) window.systemShippingFee = parseFloat(savedFrete);
             else window.systemShippingFee = 0;
 
-            if (savedWhatsapp) {
-                const cleanWa = savedWhatsapp.replace(/\D/g, '');
-                const waLinks = document.querySelectorAll('a[href*="wa.me/"]');
-                waLinks.forEach(link => {
-                    link.href = 'https://wa.me/55' + cleanWa;
-                });
-                const textSpan = document.getElementById('val-whatsapp-text');
-                if (textSpan && cleanWa.length >= 10) {
-                    const ddd = cleanWa.substring(0, 2);
-                    const prefix = cleanWa.length === 11 ? cleanWa.substring(2, 7) : cleanWa.substring(2, 6);
-                    const suffix = cleanWa.length === 11 ? cleanWa.substring(7) : cleanWa.substring(6);
-                    textSpan.innerText = `(${ddd}) ${prefix}-${suffix}`;
-                }
-            }
-
-            if (savedInstagram) {
-                const instaLinks = document.querySelectorAll('a[href*="instagram.com"]');
-                const handle = savedInstagram.startsWith('@') ? savedInstagram.substring(1) : savedInstagram;
-                const linkUrl = savedInstagramLink ? savedInstagramLink : 'https://www.instagram.com/' + handle + '/';
-                instaLinks.forEach(link => {
-                    link.href = linkUrl;
-                    link.innerHTML = '<i class="fa-brands fa-instagram text-3xl mr-4 text-cf-yellow"></i> @' + handle;
-                });
-            }
-
-            if (savedAddress) {
-                const addressSpan = document.getElementById('val-address-text');
-                if (addressSpan) addressSpan.innerText = savedAddress;
-            }
         }
 
         async function loadCoupons() {
@@ -2225,8 +2184,6 @@ if (typeof renderMenu === 'function') renderMenu();
         }
 
         async function loadShipping() {
-            let savedWhatsapp = localStorage.getItem('cleanfoods_whatsapp');
-            let savedAddress = localStorage.getItem('cleanfoods_address');
             let savedFrete = localStorage.getItem('cleanfoods_frete');
 
             if (supabaseClient) {
@@ -2234,10 +2191,6 @@ if (typeof renderMenu === 'function') renderMenu();
                     const { data, error } = await supabaseClient.from('settings').select('*');
                     if (error) throw error;
                     if (data) {
-                        const waSetting = data.find(s => s.key === 'whatsapp');
-                        if (waSetting) savedWhatsapp = waSetting.value;
-                        const addrSetting = data.find(s => s.key === 'address');
-                        if (addrSetting) savedAddress = addrSetting.value;
                         const freteSetting = data.find(s => s.key === 'frete');
                         if (freteSetting) savedFrete = freteSetting.value;
                     }

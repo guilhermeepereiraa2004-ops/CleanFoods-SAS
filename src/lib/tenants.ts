@@ -57,6 +57,10 @@ export type PublicTenant = {
   logoSize?: string;
   footerCopyright?: string;
   footerCnpj?: string;
+  whatsapp?: string;
+  address?: string;
+  instagram?: string;
+  instagramLink?: string;
   createdAt: string;
 };
 

@@ -3,12 +3,14 @@
 
     const hasTenant = new URLSearchParams(window.location.search).has('tenant');
     if (hasTenant) {
-        document.documentElement.classList.add('saas-branding-pending');
+        document.documentElement.classList.add('saas-branding-pending', 'saas-contacts-pending');
 
         // Nunca mantém as imagens ocultas indefinidamente se a configuração remota falhar.
         window.setTimeout(() => {
             document.documentElement.classList.remove('saas-branding-pending');
             document.documentElement.classList.add('saas-branding-ready');
+            document.documentElement.classList.remove('saas-contacts-pending');
+            document.documentElement.classList.add('saas-contacts-ready');
         }, 4000);
     }
 
