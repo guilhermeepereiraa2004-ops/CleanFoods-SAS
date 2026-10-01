@@ -19,7 +19,7 @@ export default async function LegacyAdminPage({
   }
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-cf-black">
+    <div className="w-full h-[100dvh] overflow-hidden bg-cf-black">
       <iframe
         src={`/admin.html?tenant=${normalizedSlug}`}
         className="w-full h-full border-none"

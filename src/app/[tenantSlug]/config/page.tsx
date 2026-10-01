@@ -130,9 +130,9 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
   const isDue = tenant.paymentStatus === 'pendente' && paymentDay > 0 && currentDay >= paymentDay;
 
   return (
-    <div className="min-h-screen bg-cf-black text-white p-8 relative">
+    <div className="min-h-screen bg-cf-black text-white p-4 sm:p-6 lg:p-8 relative">
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-cf-yellow text-cf-black font-bold px-6 py-3 border-2 border-cf-black shadow-[4px_4px_0_rgba(255,255,255,1)] z-50 flex items-center gap-3">
+        <div className="fixed bottom-3 left-3 right-3 sm:bottom-6 sm:left-auto sm:right-6 bg-cf-yellow text-cf-black font-bold px-4 sm:px-6 py-3 border-2 border-cf-black shadow-[4px_4px_0_rgba(255,255,255,1)] z-50 flex items-center justify-center sm:justify-start gap-3 text-sm sm:text-base">
           <i className="fa-solid fa-circle-check text-xl"></i>
           {toastMessage}
         </div>
@@ -140,7 +140,7 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
 
       {isDue && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-cf-darkgray border-2 border-red-500 p-8 max-w-md w-full torn-edge relative overflow-hidden">
+          <div className="bg-cf-darkgray border-2 border-red-500 p-5 sm:p-8 max-w-md w-full torn-edge relative overflow-y-auto max-h-[calc(100dvh-2rem)]">
             <div className="absolute top-0 left-0 w-full h-2 bg-red-500"></div>
             <div className="text-center mb-6">
               <i className="fa-solid fa-triangle-exclamation text-6xl text-red-500 mb-4"></i>
@@ -168,39 +168,39 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
       )}
 
       <div className={`max-w-4xl mx-auto ${isDue ? 'opacity-20 pointer-events-none blur-sm' : ''}`}>
-        <div className="flex justify-between items-center mb-8 border-b-2 border-cf-gray pb-4">
-          <h1 className="font-impact text-4xl text-cf-yellow uppercase">
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6 sm:mb-8 border-b-2 border-cf-gray pb-4">
+          <h1 className="font-impact text-3xl sm:text-4xl text-cf-yellow uppercase break-words">
             Personalizar SaaS: {tenant.name}
           </h1>
-          <div className="flex gap-4">
-            <a href={`/${tenant.slug}`} target="_blank" className="bg-cf-yellow text-cf-black font-bold px-4 py-2 text-sm hover:bg-white">
+          <div className="flex gap-2 sm:gap-4">
+            <a href={`/${tenant.slug}`} target="_blank" className="flex-1 sm:flex-none bg-cf-yellow text-cf-black font-bold px-4 py-2 text-sm text-center hover:bg-white">
               Ver Loja
             </a>
             <button onClick={() => {
               localStorage.removeItem(`tenant_auth_${tenantSlug}`);
               window.location.reload();
-            }} className="bg-gray-800 text-red-400 font-bold px-4 py-2 text-sm hover:bg-red-900/50">
+            }} className="flex-1 sm:flex-none bg-gray-800 text-red-400 font-bold px-4 py-2 text-sm hover:bg-red-900/50">
               Sair
             </button>
           </div>
         </div>
 
-        <div className="flex gap-4 mb-6">
+        <div className="flex gap-2 sm:gap-4 mb-6 overflow-x-auto pb-1">
           <button 
             onClick={() => setActiveTab('personalizacao')}
-            className={`px-4 py-2 font-bold uppercase text-sm ${activeTab === 'personalizacao' ? 'bg-cf-yellow text-cf-black' : 'bg-cf-darkgray'}`}
+            className={`shrink-0 px-4 py-2 font-bold uppercase text-xs sm:text-sm ${activeTab === 'personalizacao' ? 'bg-cf-yellow text-cf-black' : 'bg-cf-darkgray'}`}
           >
             Personalização (Visual)
           </button>
           <button 
             onClick={() => setActiveTab('pagamentos')}
-            className={`px-4 py-2 font-bold uppercase text-sm ${activeTab === 'pagamentos' ? 'bg-cf-yellow text-cf-black' : 'bg-cf-darkgray'}`}
+            className={`shrink-0 px-4 py-2 font-bold uppercase text-xs sm:text-sm ${activeTab === 'pagamentos' ? 'bg-cf-yellow text-cf-black' : 'bg-cf-darkgray'}`}
           >
             Integrações (Pagamento)
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="bg-cf-darkgray border-2 border-cf-gray p-6">
+        <form onSubmit={handleSave} className="bg-cf-darkgray border-2 border-cf-gray p-4 sm:p-6">
           {activeTab === 'personalizacao' && (
             <div className="space-y-6">
                             <div>
@@ -263,7 +263,7 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
 
                             <div className="bg-cf-black p-4 border border-cf-gray rounded space-y-3 mt-4">
                                 <h4 className="font-bold text-sm text-cf-yellow uppercase mb-2">Textos da Página Inicial (Hero)</h4>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs text-gray-400 mb-1">Palavra 1 (Padrão: Dieta)</label>
                                         <input type="text" value={tenant.heroWord1 || ''} onChange={(e) => setTenant({...tenant, heroWord1: e.target.value})} className="w-full bg-cf-darkgray text-white border border-cf-gray rounded px-2 py-1 text-sm outline-none" placeholder="Dieta" />
@@ -290,7 +290,7 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
                                       rows={2}
                                       placeholder="Marmitas fitness reais..." 
                                     />
-                                    <div className="grid grid-cols-2 gap-4 mt-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                                         <div>
                                             <label className="block text-xs text-gray-400 mb-1">Tipografia do Subtítulo</label>
                                             <select 
@@ -316,7 +316,7 @@ export default function TenantConfigPage({ params }: { params: Promise<{ tenantS
                                         </div>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-cf-gray mt-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-cf-gray mt-3">
                                     <div>
                                         <label className="block text-xs text-gray-400 mb-1">Cor do Texto Principal</label>
                                         <div className="flex items-center gap-2">

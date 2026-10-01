@@ -1,0 +1,303 @@
+/* Mobile safeguards shared by every storefront theme. */
+html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+}
+
+body,
+body * {
+    box-sizing: border-box;
+}
+
+img,
+video,
+svg,
+canvas {
+    max-width: 100%;
+}
+
+@media (max-width: 767px) {
+    .cf-low-power *,
+    .cf-low-power *::before,
+    .cf-low-power *::after {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
+    }
+
+    .cf-low-power .noise-bg,
+    .cf-low-power #smoke-video,
+    .cf-low-power video,
+    .cf-low-power .spray-blob {
+        display: none !important;
+    }
+
+    .cf-low-power [class*="backdrop-blur"] {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .cf-low-power [class*="blur-["],
+    .cf-low-power [class*="blur-"] {
+        filter: none !important;
+    }
+
+    .cf-low-power .img-hardcore,
+    .cf-low-power #saas-hero-image {
+        filter: none !important;
+        mix-blend-mode: normal !important;
+    }
+
+    .cf-low-power .reveal-up,
+    .cf-low-power .reveal-left,
+    .cf-low-power .reveal-right {
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .cf-low-power #section-combos,
+    .cf-low-power #section-frango,
+    .cf-low-power #section-patinho,
+    .cf-low-power #section-gourmet,
+    .cf-low-power #section-salgados,
+    .cf-low-power footer {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 800px;
+    }
+
+    body {
+        width: 100%;
+        min-width: 0;
+        overflow-x: clip;
+    }
+
+    header {
+        min-width: 0;
+        gap: 0.25rem;
+        padding-inline: 0.75rem !important;
+    }
+
+    header > *,
+    #hero > *,
+    #hero .container > * {
+        min-width: 0;
+    }
+
+    header .saas-logo {
+        width: auto !important;
+        height: clamp(5rem, 24vw, 7rem) !important;
+        max-width: min(42vw, 9rem) !important;
+        object-fit: contain;
+    }
+
+    header a[href="#"] {
+        white-space: nowrap;
+    }
+
+    #hero {
+        width: 100%;
+        height: auto !important;
+        min-height: 100svh !important;
+        padding: 6.5rem 0 2rem !important;
+        overflow: hidden;
+    }
+
+    #hero > .container {
+        width: 100%;
+        padding: 0 1rem !important;
+        gap: 1.5rem !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    #hero-title {
+        max-width: 100%;
+        font-size: clamp(2.35rem, 12vw, 4rem) !important;
+        line-height: 0.94 !important;
+        letter-spacing: -0.035em !important;
+        overflow-wrap: anywhere;
+    }
+
+    #hero-subtitle {
+        max-width: 100%;
+        margin-top: 1.25rem !important;
+        margin-bottom: 1.5rem !important;
+        font-size: clamp(0.9rem, 4vw, 1.05rem) !important;
+        line-height: 1.55 !important;
+    }
+
+    #hero a[href="#cardapio"] {
+        width: min(100%, 24rem);
+        padding: 0.875rem 1.25rem !important;
+        font-size: 1rem !important;
+        text-align: center;
+    }
+
+    #hero-image-container {
+        width: min(100%, 28rem) !important;
+        max-width: 100% !important;
+        margin-inline: auto !important;
+    }
+
+    .design-2 #saas-hero-image,
+    .design-3 #saas-hero-image,
+    .design-5 #saas-hero-image,
+    .design-6 #saas-hero-image {
+        display: block;
+        width: auto !important;
+        max-width: 100% !important;
+        max-height: 38svh !important;
+        margin-inline: auto !important;
+        object-fit: contain !important;
+    }
+
+    .design-4 #hero {
+        min-height: 100svh !important;
+    }
+
+    .design-4 #hero-copy {
+        width: 100% !important;
+        max-width: 34rem !important;
+    }
+
+    .design-4 #saas-hero-image {
+        max-width: none;
+    }
+
+    .design-5 #hero div[class*="h-[500px]"],
+    .design-8 #hero div[class*="h-[500px]"] {
+        height: min(78vw, 20rem) !important;
+    }
+
+    .design-7 #hero div[class*="h-[400px]"] {
+        height: min(62vw, 16rem) !important;
+    }
+
+    .design-8 #hero-text-column {
+        padding-right: 0 !important;
+    }
+
+    .design-9 #hero div[class*="h-[600px]"] {
+        height: min(92vw, 23rem) !important;
+    }
+
+    .design-7 #hero .grid > div {
+        padding: 1.25rem !important;
+    }
+
+    #cardapio {
+        padding-block: 3rem !important;
+    }
+
+    #category-filters {
+        gap: 0.5rem !important;
+        scroll-padding-inline: 1rem;
+        overscroll-behavior-inline: contain;
+    }
+
+    #category-filters button {
+        padding: 0.625rem 1rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    .section-title {
+        margin-bottom: 1.75rem !important;
+    }
+
+    .section-title h2,
+    .section-title h3,
+    footer h2 {
+        font-size: clamp(2rem, 10vw, 3.25rem) !important;
+        line-height: 1 !important;
+        overflow-wrap: anywhere;
+    }
+
+    footer {
+        padding-top: 3.5rem !important;
+    }
+
+    footer a,
+    footer [id$="-text"] {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    #cart-drawer {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-left-width: 0 !important;
+    }
+
+    #cart-items-list > div {
+        align-items: stretch !important;
+        flex-direction: column !important;
+    }
+
+    #cart-items-list > div > div:last-child {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #dish-detail-modal,
+    #checkout-modal {
+        align-items: flex-end !important;
+        padding: 0.5rem !important;
+    }
+
+    #dish-detail-modal > div,
+    #checkout-modal > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: calc(100dvh - 1rem) !important;
+        margin: 0 !important;
+        border-width: 2px !important;
+        clip-path: none !important;
+    }
+
+    #dish-detail-modal [class*="grid-cols-2"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    #checkout-modal h3 {
+        max-width: calc(100% - 2.5rem);
+        font-size: 1.5rem !important;
+        letter-spacing: 0.04em !important;
+    }
+
+    #toast-success {
+        left: 0.75rem !important;
+        right: 0.75rem !important;
+        width: auto !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.85rem !important;
+        text-align: center;
+    }
+}
+
+@media (max-width: 379px) {
+    header .saas-logo {
+        height: 4.5rem !important;
+    }
+
+    #hero {
+        padding-top: 5.5rem !important;
+    }
+
+    #hero-title {
+        font-size: clamp(2rem, 11vw, 2.75rem) !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

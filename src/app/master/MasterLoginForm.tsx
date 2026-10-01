@@ -34,7 +34,7 @@ export default function MasterLoginForm({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-cf-black p-4">
-      <div className="torn-edge w-full max-w-md border-2 border-cf-yellow bg-cf-darkgray p-8">
+      <div className="torn-edge w-full max-w-md border-2 border-cf-yellow bg-cf-darkgray p-5 sm:p-8">
         <h1 className="mb-6 text-center font-impact text-3xl uppercase tracking-widest text-cf-yellow">
           Master Admin
         </h1>

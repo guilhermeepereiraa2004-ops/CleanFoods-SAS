@@ -215,9 +215,9 @@ export default function MasterAdminPage() {
   if (!isClient) return null;
 
   return (
-    <div className="min-h-screen bg-cf-black text-white flex relative">
+    <div className="min-h-screen bg-cf-black text-white flex flex-col md:flex-row relative">
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-cf-yellow text-cf-black font-bold px-6 py-3 border-2 border-cf-black shadow-[4px_4px_0_rgba(255,255,255,1)] z-50 flex items-center gap-3">
+        <div className="fixed bottom-3 left-3 right-3 sm:bottom-6 sm:left-auto sm:right-6 bg-cf-yellow text-cf-black font-bold px-4 sm:px-6 py-3 border-2 border-cf-black shadow-[4px_4px_0_rgba(255,255,255,1)] z-50 flex items-center justify-center sm:justify-start gap-3 text-sm sm:text-base">
           <i className="fa-solid fa-circle-check text-xl"></i>
           {toastMessage}
         </div>
@@ -226,7 +226,7 @@ export default function MasterAdminPage() {
       {/* Delete Confirmation Modal */}
       {tenantToDelete && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-cf-darkgray border-2 border-red-500 p-8 max-w-md w-full torn-edge">
+          <div className="bg-cf-darkgray border-2 border-red-500 p-5 sm:p-8 max-w-md w-full torn-edge max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <h2 className="font-impact text-3xl uppercase text-red-500 mb-4">Atenção!</h2>
             <p className="text-gray-300 mb-6">
               Você está prestes a apagar a loja <strong>{tenantToDelete.name}</strong>. Esta ação não pode ser desfeita.
@@ -245,7 +245,7 @@ export default function MasterAdminPage() {
                 />
               </div>
               {deleteError && <p className="text-red-500 text-sm font-bold">{deleteError}</p>}
-              <div className="flex gap-2 mt-4">
+              <div className="flex flex-col sm:flex-row gap-2 mt-4">
                 <button type="submit" className="flex-1 bg-red-600 text-white font-bold uppercase py-3 hover:bg-red-500">
                   Apagar Loja
                 </button>
@@ -259,38 +259,38 @@ export default function MasterAdminPage() {
       )}
 
       {/* Sidebar / Menu */}
-      <div className="w-64 bg-cf-darkgray border-r border-cf-gray flex flex-col h-screen sticky top-0">
-        <div className="p-6 border-b border-cf-gray">
+      <div className="w-full md:w-64 bg-cf-darkgray border-b md:border-b-0 md:border-r border-cf-gray flex flex-col md:h-screen sticky top-0 z-40">
+        <div className="px-4 py-3 md:p-6 border-b border-cf-gray flex md:block items-center justify-between">
           <h1 className="font-impact text-2xl text-cf-yellow uppercase">CleanFoods</h1>
           <p className="text-xs text-gray-400 uppercase font-bold">Painel Master</p>
         </div>
-        <nav className="flex-1 p-4 flex flex-col gap-2">
+        <nav className="flex-1 p-2 md:p-4 flex flex-row md:flex-col gap-2 overflow-x-auto">
           <button 
             onClick={() => setActiveModule('franquias')}
-            className={`text-left px-4 py-3 font-bold uppercase text-sm ${activeModule === 'franquias' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
+            className={`text-left px-4 py-3 font-bold uppercase text-xs md:text-sm whitespace-nowrap ${activeModule === 'franquias' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
           >
             <i className="fa-solid fa-store mr-2"></i> Lojas Ativas
           </button>
           <button 
             onClick={() => setActiveModule('nova')}
-            className={`text-left px-4 py-3 font-bold uppercase text-sm ${activeModule === 'nova' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
+            className={`text-left px-4 py-3 font-bold uppercase text-xs md:text-sm whitespace-nowrap ${activeModule === 'nova' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
           >
             <i className="fa-solid fa-plus mr-2"></i> Nova Franquia
           </button>
           <button 
             onClick={() => setActiveModule('cobranca')}
-            className={`text-left px-4 py-3 font-bold uppercase text-sm ${activeModule === 'cobranca' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
+            className={`text-left px-4 py-3 font-bold uppercase text-xs md:text-sm whitespace-nowrap ${activeModule === 'cobranca' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
           >
             <i className="fa-solid fa-file-invoice-dollar mr-2"></i> Cobrança
           </button>
           <button 
             onClick={() => setActiveModule('config')}
-            className={`text-left px-4 py-3 font-bold uppercase text-sm ${activeModule === 'config' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
+            className={`text-left px-4 py-3 font-bold uppercase text-xs md:text-sm whitespace-nowrap ${activeModule === 'config' ? 'bg-cf-yellow text-cf-black' : 'text-gray-300 hover:bg-gray-800'}`}
           >
             <i className="fa-solid fa-gear mr-2"></i> Configurações
           </button>
         </nav>
-        <div className="p-4 border-t border-cf-gray">
+        <div className="hidden md:block p-4 border-t border-cf-gray">
           <form action={logoutMaster}>
             <button type="submit" className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-900/30 uppercase font-bold">
               <i className="fa-solid fa-right-from-bracket mr-2"></i> Sair
@@ -300,16 +300,16 @@ export default function MasterAdminPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         {/* MODULE: Franquias Ativas */}
         {activeModule === 'franquias' && (
           <div>
             <h2 className="font-impact text-4xl mb-8 uppercase text-cf-yellow">Franquias Ativas</h2>
             <div className="grid gap-4">
               {tenants.map(t => (
-                <div key={t.id} className="bg-cf-darkgray p-5 border border-cf-gray rounded shadow-lg">
+                <div key={t.id} className="bg-cf-darkgray p-4 sm:p-5 border border-cf-gray rounded shadow-lg min-w-0">
                   {editingTenantId === t.id ? (
-                    <form onSubmit={handleSaveEdit} className="grid grid-cols-2 gap-4">
+                    <form onSubmit={handleSaveEdit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs uppercase font-bold text-gray-400 mb-1">Nome da Loja</label>
                         <input type="text" required value={editTenantForm.name} onChange={(e) => setEditTenantForm({ ...editTenantForm, name: e.target.value })} className="w-full bg-cf-black border border-cf-gray p-2 text-white outline-none" />
@@ -336,21 +336,21 @@ export default function MasterAdminPage() {
                       </div>
                     </form>
                   ) : (
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-bold text-xl">{t.name}</h3>
-                        <p className="text-sm text-gray-400 font-mono mt-1">cleanfoodsp.com.br/{t.slug}</p>
+                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-xl break-words">{t.name}</h3>
+                        <p className="text-sm text-gray-400 font-mono mt-1 break-all">cleanfoodsp.com.br/{t.slug}</p>
                         <p className="text-xs text-cf-yellow mt-2"><i className="fa-solid fa-user"></i> {t.adminUser || 'Sem login'}</p>
                       </div>
-                      <div className="flex flex-col gap-2 items-end">
-                        <div className="flex gap-2">
+                      <div className="flex flex-col gap-2 items-stretch sm:items-end">
+                        <div className="grid grid-cols-[auto_1fr] sm:flex gap-2">
                           <button onClick={() => setTenantToDelete(t)} className="text-sm bg-red-900/50 text-red-400 border border-red-900 font-bold px-3 py-2 hover:bg-red-600 hover:text-white rounded min-w-[40px]">
                             <i className="fa-solid fa-trash"></i>
                           </button>
                           <button onClick={() => handleStartEdit(t)} className="text-sm bg-blue-600 text-white font-bold px-4 py-2 hover:bg-blue-500 rounded min-w-[80px]">
                             Editar
                           </button>
-                          <a href={`/${t.slug}/admin`} target="_blank" className="text-sm bg-gray-700 text-white font-bold px-4 py-2 hover:bg-gray-600 rounded text-center min-w-[120px]">
+                          <a href={`/${t.slug}/admin`} target="_blank" className="col-span-2 sm:col-span-1 text-sm bg-gray-700 text-white font-bold px-4 py-2 hover:bg-gray-600 rounded text-center sm:min-w-[120px]">
                             Acessar Painel
                           </a>
                         </div>
@@ -371,8 +371,8 @@ export default function MasterAdminPage() {
         {activeModule === 'nova' && (
           <div>
             <h2 className="font-impact text-4xl mb-8 uppercase text-cf-yellow">Criar Nova Franquia</h2>
-            <form onSubmit={handleCreateTenant} className="bg-cf-darkgray border border-cf-gray p-6 max-w-2xl">
-              <div className="grid grid-cols-2 gap-6 mb-6">
+            <form onSubmit={handleCreateTenant} className="bg-cf-darkgray border border-cf-gray p-4 sm:p-6 max-w-2xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
                 <div>
                   <label className="block text-xs uppercase font-bold text-gray-400 mb-2">Nome da Loja</label>
                   <input type="text" required value={newTenant.name} onChange={(e) => setNewTenant({ ...newTenant, name: e.target.value })} className="w-full bg-cf-black border border-cf-gray p-3 text-white outline-none focus:border-cf-yellow" placeholder="CleanFoods Bahia" />
@@ -385,7 +385,7 @@ export default function MasterAdminPage() {
               
               <div className="border-t border-cf-gray pt-6 mb-6">
                 <h3 className="font-bold text-cf-yellow mb-4 uppercase text-sm"><i className="fa-solid fa-lock mr-2"></i> Credenciais de Acesso (Dono da Loja)</h3>
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label className="block text-xs uppercase font-bold text-gray-400 mb-2">Usuário / Login</label>
                     <input type="text" required value={newTenant.adminUser} onChange={(e) => setNewTenant({ ...newTenant, adminUser: e.target.value })} className="w-full bg-cf-black border border-cf-gray p-3 text-white outline-none focus:border-cf-yellow" placeholder="bahia_admin" />
@@ -417,8 +417,8 @@ export default function MasterAdminPage() {
           <div>
             <h2 className="font-impact text-4xl mb-8 uppercase text-cf-yellow">Gestão de Cobranças</h2>
             
-            <div className="bg-cf-darkgray border border-cf-gray rounded overflow-hidden shadow-lg">
-              <table className="w-full text-left">
+            <div className="bg-cf-darkgray border border-cf-gray rounded overflow-x-auto shadow-lg">
+              <table className="w-full min-w-[680px] text-left">
                 <thead className="bg-[#111] border-b border-cf-gray">
                   <tr>
                     <th className="p-4 font-bold uppercase text-xs text-gray-400">Franquia</th>
@@ -469,7 +469,7 @@ export default function MasterAdminPage() {
         {activeModule === 'config' && (
           <div>
             <h2 className="font-impact text-4xl mb-8 uppercase text-cf-yellow">Configurações do Master</h2>
-            <form onSubmit={handleSaveMasterConfig} className="bg-cf-darkgray border border-cf-gray p-6 max-w-2xl">
+            <form onSubmit={handleSaveMasterConfig} className="bg-cf-darkgray border border-cf-gray p-4 sm:p-6 max-w-2xl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-xs uppercase font-bold text-gray-400 mb-2">Chave PIX (Mensalidades)</label>

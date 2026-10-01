@@ -31,7 +31,7 @@ export default async function StorefrontPage({
   const storefrontFile = `index-${selectedTheme.replace('design', '')}.html`;
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-cf-black">
+    <div className="w-full h-[100dvh] overflow-hidden bg-cf-black">
       <iframe
         src={`/${storefrontFile}?tenant=${normalizedSlug}&theme=${selectedTheme}`}
         className="w-full h-full border-none"
