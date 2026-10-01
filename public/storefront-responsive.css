@@ -301,3 +301,14 @@ canvas {
         transition-duration: 0.01ms !important;
     }
 }
+html.saas-branding-pending body.storefront header img,
+html.saas-branding-pending body.storefront #saas-hero-image {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+html.saas-branding-ready body.storefront header img,
+html.saas-branding-ready body.storefront #saas-hero-image {
+    visibility: visible;
+    transition: opacity 180ms ease-out;
+}

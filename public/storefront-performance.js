@@ -1,6 +1,17 @@
 (function () {
     'use strict';
 
+    const hasTenant = new URLSearchParams(window.location.search).has('tenant');
+    if (hasTenant) {
+        document.documentElement.classList.add('saas-branding-pending');
+
+        // Nunca mantém as imagens ocultas indefinidamente se a configuração remota falhar.
+        window.setTimeout(() => {
+            document.documentElement.classList.remove('saas-branding-pending');
+            document.documentElement.classList.add('saas-branding-ready');
+        }, 4000);
+    }
+
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const lowPowerMode = window.matchMedia('(max-width: 767px), (prefers-reduced-motion: reduce)').matches
         || Boolean(connection && connection.saveData)

@@ -13,6 +13,24 @@ function escapeHtml(value) {
         .replaceAll("'", '&#039;');
 }
 
+async function revealStorefrontBranding() {
+    const images = [...document.querySelectorAll('body.storefront header img, body.storefront #saas-hero-image')];
+    const pendingImages = images.filter((image) => !image.complete);
+
+    if (pendingImages.length) {
+        await Promise.race([
+            Promise.allSettled(pendingImages.map((image) => new Promise((resolve) => {
+                image.addEventListener('load', resolve, { once: true });
+                image.addEventListener('error', resolve, { once: true });
+            }))),
+            new Promise((resolve) => window.setTimeout(resolve, 500))
+        ]);
+    }
+
+    document.documentElement.classList.remove('saas-branding-pending');
+    document.documentElement.classList.add('saas-branding-ready');
+}
+
 function optimizeStorefrontImage(file, maxWidth, maxHeight) {
     const maxDataUrlLength = 800000;
 
@@ -287,6 +305,7 @@ async function initSaas() {
     }
 
     if (!tenantSlug) {
+        await revealStorefrontBranding();
         if(document.body) { document.body.style.opacity = '1'; document.body.style.visibility = 'visible'; }
         return;
     }
@@ -313,6 +332,7 @@ async function initSaas() {
         }
         : localTenant;
     if (!tenant) {
+        await revealStorefrontBranding();
         if(document.body) { document.body.style.opacity = '1'; document.body.style.visibility = 'visible'; }
         return;
     }
@@ -569,6 +589,8 @@ async function initSaas() {
                     }
                 }
             }
+
+            await revealStorefrontBranding();
 
             // === ATUALIZA CONTATOS DO RODAPÉ (WhatsApp, Instagram, Endereço) ===
             // Aguarda o supabaseClient ser inicializado pela página (ele é criado num script inline DEPOIS do saas-injector)
