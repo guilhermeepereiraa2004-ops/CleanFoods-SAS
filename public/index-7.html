@@ -210,32 +210,10 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS precompiled for fast storefront startup -->
+    <link rel="stylesheet" href="/storefront-tailwind.css">
     <!-- Mercado Pago SDK -->
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'cf-black': '#0E0E0E',
-                        'cf-yellow': '#F6C500',
-                        'cf-darkgray': '#1A1A1A',
-                        'cf-gray': '#333333',
-                    },
-                    fontFamily: {
-                        'impact': ['Anton', 'sans-serif'],
-                        'street': ['Permanent Marker', 'cursive'],
-                        'body': ['Inter', 'sans-serif'],
-                    },
-                    backgroundImage: {
-                        'spray': "radial-gradient(circle, rgba(246,197,0,0.15) 0%, rgba(14,14,14,0) 70%)",
-                    }
-                }
-            }
-        }
-    </script>
+    <script defer src="https://sdk.mercadopago.com/js/v2"></script>
 
     <style>
         :root {
@@ -621,7 +599,6 @@
     </style>
     <link rel="stylesheet" href="/storefront-responsive.css">
     <script src="/storefront-performance.js"></script>
-    <style id='saas-fouc-preventer'>body { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }</style>
 </head>
 
 <body class="antialiased font-body relative storefront design-7">
@@ -629,15 +606,6 @@
 
 
     <div class="noise-bg"></div>
-
-    <!-- Floating Cardapio Button -->
-    <div id="floating-cardapio-btn"
-        class="fixed bottom-6 left-6 z-40 opacity-0 pointer-events-none transform translate-y-24 scale-75 transition-all duration-500 ease-out">
-        <a href="#cardapio"
-            class="bg-cf-yellow text-cf-black font-impact text-xl sm:text-2xl uppercase tracking-wider px-6 py-4 border-4 border-cf-black hover:border-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(246,197,0,0.8)] cursor-hover btn-attention">
-            <i class="fa-solid fa-book-open mr-2"></i> CARDÁPIO
-        </a>
-    </div>
 
     <!-- Floating WhatsApp -->
     <a href="https://wa.me/5511910993953" target="_blank"
@@ -692,7 +660,7 @@
                     <a href="#cardapio" class="mt-8 bg-cf-yellow text-cf-black text-center py-3 font-bold uppercase hover:bg-white transition-colors">ACESSAR CARDÁPIO</a>
                 </div>
                 <div class="lg:col-span-3 h-[400px] border border-cf-gray overflow-hidden relative group">
-                    <img id="saas-hero-image" src="Marmita gourmet.jpg" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80" alt="Produto Hero" />
+                    <img id="saas-hero-image" src="marmita-gourmet.webp" width="1067" height="1600" fetchpriority="high" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80" alt="Produto Hero" />
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <span class="text-cf-yellow font-bold text-2xl tracking-[0.5em] uppercase border-y-2 border-cf-yellow py-2 px-8 bg-black/70 backdrop-blur-sm">PRODUTOS</span>
                     </div>

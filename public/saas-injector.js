@@ -297,9 +297,7 @@ async function initSaas() {
     let remoteTenant = null;
 
     try {
-        const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`, {
-            cache: 'no-store'
-        });
+        const response = await fetch(`/api/tenants/${encodeURIComponent(tenantSlug)}`);
         if (response.ok) remoteTenant = await response.json();
     } catch (error) {
         console.warn('Não foi possível atualizar os dados públicos da loja.', error);

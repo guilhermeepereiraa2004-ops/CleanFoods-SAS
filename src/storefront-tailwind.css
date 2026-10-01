@@ -1,0 +1,22 @@
+@import "tailwindcss" source(none);
+
+@source "../public/index-2.html";
+@source "../public/index-3.html";
+@source "../public/index-4.html";
+@source "../public/index-5.html";
+@source "../public/index-6.html";
+@source "../public/index-7.html";
+@source "../public/index-8.html";
+@source "../public/index-9.html";
+@source "../public/saas-injector.js";
+
+@theme {
+  --color-cf-black: #0e0e0e;
+  --color-cf-yellow: #f6c500;
+  --color-cf-darkgray: #1a1a1a;
+  --color-cf-gray: #333333;
+  --font-impact: "Anton", sans-serif;
+  --font-street: "Permanent Marker", cursive;
+  --font-body: "Inter", sans-serif;
+  --background-image-spray: radial-gradient(circle, rgba(246, 197, 0, 0.15) 0%, rgba(14, 14, 14, 0) 70%);
+}

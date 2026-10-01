@@ -19,7 +19,11 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(tenant, { headers: { 'Cache-Control': 'no-store' } });
+  return NextResponse.json(tenant, {
+    headers: {
+      'Cache-Control': 'public, max-age=5, s-maxage=10, stale-while-revalidate=60',
+    },
+  });
 }
 
 type StorefrontConfiguration = {
